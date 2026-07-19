@@ -1,38 +1,54 @@
-# COMMAND CENTER PROTOCOL — The Arcade Realm
-v1.1 — 2026-07-17
+# STATE_LEDGER — The Arcade Realm
+**LEDGER v2 — 2026-07-19**
+Canonical name: **UNRESOLVED** ("The Arcade Realm" vision layer vs. "Arena" build layer) — see DECISIONS.
 
-## The one idea
-The command center is not a chat. It is this protocol plus one file — `STATE_LEDGER.md` — living in Project knowledge. Any chat in this Project that opens the ledger becomes the command center for that session. Chats are disposable; the ledger is not.
+> **ESCALATION RULE:** work that changes GATES or DECISIONS → Fable, max thinking.
+> Work that only moves STATUS or NEXT → Fable, low. Builds run in Claude Code.
+> This file is truth. CLAUDE.md carries a read-only mirror — refresh it, never hand-edit it.
 
-## The seat (hybrid)
-- **Truth:** `STATE_LEDGER.md` in Project knowledge.
-- **Mirror:** `CLAUDE.md` in the Claude Code repo carries a `## COMMAND STATE MIRROR (v#, date)` block — pasted from the ledger's STATUS + GATES + NEXT sections, never hand-edited.
-- **Repo copy:** if a full ledger file also lives in the repo, it is a working copy only. Published truth is always the latest Project-knowledge upload; the version stamp arbitrates.
-- **Drift check:** if the mirror's version stamp is behind the ledger's, refresh before building. Flow is one-way: ledger → mirror. Nothing writes the mirror except a paste.
+## PHASE
+Pre-build. Spec layer complete (24 task docs + LAUNCH_KIT + cheatsheet). Command-center
+repo node is live (commit edba193). Critical path start: freeze F1, finish L1.
 
-## Session-open ritual
-Say: **"Open the ledger."** Claude reads `STATE_LEDGER.md` from Project knowledge and states version, phase, and next actions in three lines. Work begins from there. If the version isn't what you expect, you're looking at a stale upload — replace it first.
+## STATUS
+| Chain | Task | Status | Note |
+|---|---|---|---|
+| — | Command-center repo node | COMPLETE | CLAUDE.md mirror + protocol/ledger working copies at repo root (edba193); mirror holds placeholders — needs first real paste from this v2 |
+| F | F1 game-module contract | NOT STARTED | First domino — freeze before anything else |
+| F | F2 database schema | NOT STARTED | Blocked by F1 |
+| F | F3 PWA shell + auth/gating | NOT STARTED | Blocked by F1 |
+| F | F4 reference games | NOT STARTED | Blocked by F1; React prototype exists as raw material, not contract-compliant |
+| R | R1–R4 runtime | NOT STARTED | Blocked by F-spine |
+| G | G1–G7 factory | NOT STARTED | Deliberately deferred until the loop is proven at one venue |
+| L | L1 lore bible | DRAFT | "Drain vs. the Realm" first draft exists; human-authored — needs founder pass to FROZEN |
+| L | L2–L5 | NOT STARTED | Blocked by L1 freeze |
+| C | C1–C3 | NOT STARTED | — |
+| C | C4 attorney brief | ASSEMBLED | Brief + ADDENDUM-1 exist; awaiting counsel engagement |
 
-## Session-close ritual (the heartbeat)
-At the end of any session that produced something ledger-worthy, say: **"Close the ledger."** Claude regenerates the FULL file — version +1, dated, one delta-log line added. You re-upload it to Project knowledge, replacing the old copy. That re-upload is the single manual heartbeat of the entire system. If nothing ledger-worthy happened: "no delta," no close, no upload.
+## GATES
+| Gate | State | Rule |
+|---|---|---|
+| Arena Coin counsel clearance | OPEN | No earn/redeem mechanic ships until CLEARED |
+| Crowdfunding consideration question | OPEN | No public campaign page until CLEARED |
 
-**A close is not complete until the re-upload lands.** Claude Code writing files in the repo never touches Project knowledge — the upload is always yours.
+## DECISIONS
+**Pending:**
+- Naming — "Arena" vs. "The Arcade Realm" across vision and build layers (Code session is `arena-command-center`).
 
-## What counts as ledger-worthy
-A STATUS BLOCK arrived · a task changed state · a gate opened or cleared · a decision was ruled or became pending · launch order changed · a risk got promoted. Pure Q&A, drafting, and exploration: no delta.
+**Ruled:**
+- 2026-07-17 — Command center = protocol + this ledger, not a chat. Hybrid seat: Project ledger is truth; CLAUDE.md mirrors.
+- 2026-07-17 — Model tiering: Fable low default; max on GATES/DECISIONS work (escalation rule above).
+- 2026-07-19 — Protocol version is v1.1; the "v1.4" cited in the Code task was an erroneous citation, not a missing file. Repo working copies match truth.
 
-## Model tiering
-- **Default — Fable, low thinking:** opens, closes, status folding, packet generation, doc edits, "what's next."
-- **Escalate — Fable, max thinking:** any work that would change GATES or DECISIONS. Ecosystem architecture, legal structure, solvency and HQ-Trivia analysis, the naming ruling, anything touching the five-ecosystem design.
-- The rule, printed in the ledger header so every session sees it: **cost follows consequence.**
-- Claude Code runs builds on its own model. Heavyweight design questions get pulled OUT of Code, ruled in a max session here, and pushed back as spec.
+## NEXT (launchable now, dependency-safe)
+0. **Mirror paste** — paste this v2's STATUS + GATES + NEXT into the CLAUDE.md `COMMAND STATE MIRROR` block and commit (replaces placeholders).
+1. **F1** — freeze the game-module contract (Claude Code: `claude -r arena-command-center`).
+2. **L1** — founder pass on the lore bible draft → FROZEN.
+3. **Counsel engagement** using the C4 brief — the only path to clearing both GATES.
+4. **Strategy session (max thinking):** HQ Trivia post-mortem parallel + prize-cost solvency model — flagged highest-priority risk work.
 
-## How the two loops plug in
-- **LAUNCH_KIT agent chats:** unchanged. They still end with STATUS BLOCKs; you paste those into any command-center session; they fold at the next close.
-- **Claude Code (`claude -r arena-command-center`):** treated as one more agent. End every Code session by having it emit a STATUS BLOCK in the LAUNCH_KIT format; paste it here; fold at close; refresh the CLAUDE.md mirror whenever STATUS, GATES, or NEXT changed. One status grammar everywhere.
+Do not start: F2+ (needs F1), the Factory (needs a proven loop at one venue), anything token or crowdfund related (gated).
 
-## Failure modes and their answers
-- **Chat dies mid-thread** → open a new one, "Open the ledger," continue. Nothing is lost but conversation flavor.
-- **Forgot to re-upload** → the next open shows a stale version stamp; close again from the freshest session.
-- **Two sessions closed in parallel** → higher delta-log version wins; fold the loser's lines into a fresh close. Avoid by keeping one working session at a time.
-- **Ledger bloats** → it must stay under ~2 pages. History lives in the last five delta-log lines only; detail belongs in the task docs, not here.
+## DELTA LOG
+- v2 (2026-07-19): Folded Command Center 2 STATUS BLOCK — repo node live (edba193); "v1.4 protocol" flag resolved as citation error; truncated Downloads ledger flag resolved (Project copy has full STATE sections); mirror-paste step added as NEXT 0.
+- v1 (2026-07-17): Ledger established; protocol adopted; seeded from doc-kit state — correct any row that has drifted at first close.
