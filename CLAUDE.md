@@ -26,7 +26,7 @@ Claude Code reads this first in every session. ARENA's canon lives in this repo,
 ## close the arena ledger
 1. Add one line directly under the `---` in SESSION_LOG.md: `YYMMDD | ARENA | what moved | outcome`. The outcome is where it stopped or what was confusing.
 2. If anything was ruled this session, its DECISIONS file must already exist. If it doesn't, write it now.
-3. `git add` only the files you touched, then `git commit -m "close: <what moved>"`. Don't push; there's no remote yet.
+3. `git add` only the files you touched, then `git commit -m "close: <what moved>"`, then `git push`.
 4. Regenerate nothing. Close takes ten seconds and has to work when the founder is tired.
 
 ## Rulings
@@ -69,6 +69,10 @@ Blocked until ruled:
 - If a checkpoint fails, stop. Don't troubleshoot in place.
 - Use files, not pastes: pastes over ~30 lines get truncated. Hand anything long over as a file in this repo.
 - Explain each label (F1, PR-2, OPS-1…) at first mention: what it is and why it matters.
+
+## Sync
+- Session start: `git pull --rebase`
+- Session end: commit, then `git push`. The claude.ai Project mirrors GitHub, so unpushed work is invisible to command-center chats.
 
 ## BUTTERCUP (addressable-only role)
 Invocation: a message beginning "Buttercup," — otherwise this role is silent.
