@@ -1,0 +1,11 @@
+{
+  "gameId": "precision-tap",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "human",
+  "parentLineage": null,
+  "authoredAt": "2026-10-18",
+  "license": "proprietary",
+  "ipClearance": "Original work. No third-party characters, mechanics, or assets derived from existing games. Tap-target mechanic is genre-standard and not protectable.",
+  "notes": "F4 reference game 1. Exercises: PRNG injection, discrete tap events, flat difficulty curve, hit/miss implicit in event log."
+}

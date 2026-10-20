@@ -1,0 +1,11 @@
+{
+  "gameId": "pressure-hold",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "human",
+  "parentLineage": null,
+  "authoredAt": "2026-10-18",
+  "license": "proprietary",
+  "ipClearance": "Original work. Gauge-hold mechanic is genre-standard and not protectable. All code authored from scratch.",
+  "notes": "F4 reference game 2. Exercises: PRNG-seeded deterministic oscillation, hold_start/hold_end event pairs, ramp difficulty curve, auto-close of open hold at round end, server-replayable continuous scoring."
+}
