@@ -2,6 +2,7 @@
 One entry per work session. Add at CLOSE. Format: `YYMMDD | [venture] | what moved | outcome`
 
 ---
+2026-10-19 | RECON | stopped at: SAFE TO BUILD F3 | confused by: -
 
 261018 | ARENA | F4 built — precision-tap (tap/flat) + pressure-hold (hold/ramp); provenance.json for both; capsule updated | F3 is now the critical-path blocker
 260906 | HQ/ASS | scaffolded 00-COMMAND + 10-CANON/DECISIONS, ratified PR-1–PR-6 (PR-6 stub), confirmed Gavin v5.2 send | capsule updated, committed
