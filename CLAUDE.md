@@ -11,14 +11,14 @@ Claude Code reads this first in every session. ARENA's canon lives in this repo,
 
 | File | Holds | Written |
 |---|---|---|
-| `00-COMMAND/CONTEXT_CAPSULE.md` | State and the one NEXT ACTION, on one page | At open if it has drifted, and at any change of direction |
-| `00-COMMAND/SESSION_LOG.md` | One line per session, newest first | At close |
-| `00-COMMAND/FRICTION_LOG.md` | Where a doc caused confusion or rework | When it happens. Three hits on one doc flags it for audit |
-| `10-CANON/DECISIONS/` | One file per founder ruling | The moment the founder rules |
-| `00-COMMAND/PROPOSED/` | Drafts awaiting a ruling, such as OPS-4 | Never treat as canon |
+| `governance/00-COMMAND/CONTEXT_CAPSULE.md` | State and the one NEXT ACTION, on one page | At open if it has drifted, and at any change of direction |
+| `governance/00-COMMAND/SESSION_LOG.md` | One line per session, newest first | At close |
+| `governance/00-COMMAND/FRICTION_LOG.md` | Where a doc caused confusion or rework | When it happens. Three hits on one doc flags it for audit |
+| `governance/10-CANON/DECISIONS/` | One file per founder ruling | The moment the founder rules |
+| `governance/00-COMMAND/PROPOSED/` | Drafts awaiting a ruling, such as OPS-4 | Never treat as canon |
 
 ## open the arena ledger
-1. Read the capsule, the top 5 SESSION_LOG lines, `ls 10-CANON/DECISIONS/` and `git log --oneline -5`.
+1. Read the capsule, the top 5 SESSION_LOG lines, `ls governance/10-CANON/DECISIONS/` and `git log --oneline -5`.
 2. Drift check: compare the capsule's "Updated:" stamp with the newest log line and the last commit.
 3. Reply in three lines: where things stand · the NEXT ACTION · drift (or "none"). Nothing else.
 4. If the capsule has drifted, offer a regenerated one, one page at most. Write it only when the founder says yes.
@@ -42,7 +42,7 @@ Claude Code reads this first in every session. ARENA's canon lives in this repo,
   ## Downstream
   ## Note (optional)
   ```
-- Never edit a ruling in place (OPS-2). Supersede it: write a new file, move the old one to `90-ARCHIVE/<date>/`, and say why.
+- Never edit a ruling in place (OPS-2). Supersede it: write a new file, move the old one to `governance/90-ARCHIVE/<date>/`, and say why.
 
 ## Stop and hand off (OPS-1)
 Builds run here at medium-to-high effort, depending on task risk. Stop instead of deciding in code when a change would:
@@ -75,4 +75,4 @@ Invocation: a message beginning "Buttercup," — otherwise this role is silent.
 Modes: COMPASS (orientation / skills / industry framing) · RUNWAY (granular walkthrough).
 RUNWAY contract: no preamble · assume nothing installed · one action per step · observable checkpoint per step · failure branches inline · assume over asking · end with the exact next command.
 Never rules on architecture or gates. Never emits a STATUS BLOCK or ledger delta.
-Log every RUNWAY invocation to 00-COMMAND/FRICTION_LOG.md.
+Log every RUNWAY invocation to governance/00-COMMAND/FRICTION_LOG.md.
