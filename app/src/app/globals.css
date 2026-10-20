@@ -1,0 +1,72 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --crimson:        #E0103A;
+  --crimson-bright: #FF3355;
+  --cyan:           #2DE2E6;
+  --bg:             #07080F;
+  --fg:             #F0F0F0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  font-size: 18px;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(2rem, 10vw, 5rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+p { max-width: 40ch; line-height: 1.5; }
+
+button {
+  background: var(--crimson);
+  color: var(--fg);
+  border: none;
+  padding: 0.875rem 2.5rem;
+  font-size: 1rem;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.15s;
+  width: 100%;
+  max-width: 320px;
+}
+
+button:hover { background: var(--crimson-bright); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+input {
+  background: transparent;
+  border: 1px solid var(--fg);
+  color: var(--fg);
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+  max-width: 320px;
+  outline: none;
+}
+
+input:focus { border-color: var(--cyan); }
+
+.muted { opacity: 0.5; font-size: 0.875rem; }
