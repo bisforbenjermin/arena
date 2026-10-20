@@ -33,3 +33,31 @@ Unfolded deltas, newest at the bottom. Fold each one per DELTA_PROTOCOL.md, then
 
 ### NEXT
 - Run the determinism test. Verdict gates everything downstream.
+
+---
+
+## DELTA — Repo ↔ Project marriage — 2026-10-20
+
+### RULED
+- Repo is the single source of truth; the claude.ai Project mirrors GitHub (bisforbenjermin/arena, main). EXPENSIVE. (adopted by execution)
+- Repo is private. REVERSIBLE. (adopted by execution)
+- Close = commit + push, then "Sync now" in the Project. Replaces "close requires re-upload". REVERSIBLE. (adopted by execution)
+- Remaining housekeeping moves (build dirs → 30-BUILD/) cancelled. REVERSIBLE. (adopted by execution)
+
+### DONE
+- Repo pushed to GitHub; CLAUDE.md gained the Sync section (pull at start, push at end)
+- ~50 Project-only docs imported in 601eb5f (specs, BUTTERCUP, DELTA_PROTOCOL, AUDIT_PROMPTS, C4-ADDENDUM-1, strategy, lore draft, employability, archive)
+- Project knowledge wiped except investor/ARENA_FIRST_LOOK.html (kept out of repo per LG-7)
+- Command-center chats can now clone and push the repo directly
+
+### DISCOVERED
+- Project PDFs are now real PDFs (VAULT_AUDIT C-1 described image ZIPs); originals in docs/reference/origin/
+- Two ARENA_BOARD_INSTRUCTIONS versions exist; Project copy archived beside the PROPOSED one
+- Project "Instructions" field is empty; ARENA_BOARD_INSTRUCTIONS was written to fill it once OPS-4 is ruled
+
+### OPEN
+- This INBOX (2 deltas) not yet folded
+- F3 continues on STACK-1; auth provider ruling status to confirm at fold
+
+### NEXT
+- Fold the INBOX, then resume F3.
