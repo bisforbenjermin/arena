@@ -2,6 +2,7 @@
 One entry per work session. Add at CLOSE. Format: `YYMMDD | [venture] | what moved | outcome`
 
 ---
+261020 | ARENA | Claude Code GitHub App installed; gh api /user/installations 403 explained; "Danger zone" label explained | no files changed, no rulings
 261020 | ARENA | gitignore .DS_Store + tsbuildinfo; typecheck fixed (CookieOptions annotation, worker excluded from tsconfig); determinism gate 2/2 PASS | HEAD 94813da on origin/main; app/package-lock.json still untracked
 261020 | ARENA | repo stabilized and pushed to GitHub (bisforbenjermin/arena, private); CLAUDE.md sync rules added; determinism gate 2/2 PASS; typecheck blocked (terser@^5.51.0 not in registry) | HEAD bd2c3c7 on origin/main
 261020 | ARENA | RECON.md bare paths fixed (governance/ prefix); verify pass found no housekeeping commit; zip port attempt blocked (arena_port.zip not found, no manifest) | RECON.md fix uncommitted until close
