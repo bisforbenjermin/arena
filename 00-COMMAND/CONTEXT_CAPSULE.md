@@ -1,11 +1,15 @@
 # CONTEXT CAPSULE
-Updated: 261018-1 (prev: 260907-1)
+Updated: 261020-1 (prev: 261018-1)
 Keep this under one page. Rewrite at every significant direction change.
 
 ---
 
 ## NEXT ACTION
-F4 DONE. Critical path: F3 (PWA shell + auth + eligibility gating) — this is the last foundation block before the entire R-layer (R1–R4) unlocks. F3 also unblocks the first live venue test.
+F3 build ready to start — RECON confirmed SAFE TO BUILD F3. Two stack decisions needed before first line of code:
+1. **Auth provider** — Supabase Auth strongly implied by F2 but not ruled; confirm or override.
+2. **Frontend framework** — nothing in repo yet; need a pick before scaffolding.
+
+Once decided: F3 = PWA shell + Supabase Auth + Rail 1 key eligibility gate + CP-0 prize block. Last foundation block before R-layer (R1–R4) unlocks and first live venue test.
 
 In parallel (non-blocking): G1 can start now (only needs F1). L1 is yours to write — no agents can touch L2–L5 until it's done.
 
@@ -49,4 +53,8 @@ In parallel (non-blocking): G1 can start now (only needs F1). L1 is yours to wri
 ---
 
 ## LAST SESSION
+261020 — RECON re-run; determinism gate (tests/determinism.ts) confirmed passing (committed 261019). Read all F3 board decisions: Rail 1 key gate and CP-0 prize block are settled; auth provider and frontend framework are unruled. F3 build blocked on those two calls.
+
+261019 — Determinism gate written and committed: tests/determinism.ts; PR-1/PR-2/PR-3 PASS, PR-4 PARTIAL (no exported version constant), PR-5 PASS, F2 claim/verified PASS. SAFE TO BUILD F3.
+
 261018 — F4 built: precision-tap (tap/flat) + pressure-hold (hold/ramp); both provenance.json written; capsule updated. F3 is now the critical-path blocker.
