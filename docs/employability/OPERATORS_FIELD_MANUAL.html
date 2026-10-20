@@ -1,0 +1,970 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Operator's Field Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+/* Layout: numbered field-manual sections, hairline rules, reference cards in grids, print-first */
+:root{
+  --paper:#f3f6f8;
+  --field:#ffffff;
+  --ink:#10141a;
+  --ink-2:#4a5668;
+  --ink-3:#6b7889;
+  --rule:#d2dae1;
+  --wash:#e7edf2;
+  --signal:#a63d26;
+  --safe:#166055;
+  --mark:#27496d;
+  --signal-wash:#f6e7e2;
+  --safe-wash:#e2efec;
+  --mark-wash:#e4ebf3;
+
+  --display:'Archivo',system-ui,sans-serif;
+  --body:'Source Serif 4',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0d1117;--field:#161c24;--ink:#e7ecf2;--ink-2:#9aa7b8;--ink-3:#7a8798;
+    --rule:#28313d;--wash:#1a222c;
+    --signal:#e07a5c;--safe:#4fb8a4;--mark:#86aed6;
+    --signal-wash:#2a1a15;--safe-wash:#13261f;--mark-wash:#161f2c;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0d1117;--field:#161c24;--ink:#e7ecf2;--ink-2:#9aa7b8;--ink-3:#7a8798;
+  --rule:#28313d;--wash:#1a222c;
+  --signal:#e07a5c;--safe:#4fb8a4;--mark:#86aed6;
+  --signal-wash:#2a1a15;--safe-wash:#13261f;--mark-wash:#161f2c;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.58;
+  margin:0;
+}
+.wrap{
+  max-width:980px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 72px;
+}
+
+/* ---- masthead ---- */
+.mast{border-bottom:3px solid var(--ink);padding-block:40px 18px;margin-bottom:8px}
+.mast .kicker{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 14px;
+}
+.mast h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,58px);
+  line-height:1.02;letter-spacing:-.02em;margin:0;text-wrap:balance;
+}
+.mast .sub{font-size:17px;color:var(--ink-2);margin:14px 0 0;max-width:62ch}
+.mast .meta{
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  margin-top:18px;display:flex;gap:18px;flex-wrap:wrap;
+}
+
+/* ---- sections ---- */
+section{padding-block:38px;border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:none}
+.shead{display:flex;gap:16px;align-items:baseline;margin-bottom:6px}
+.snum{
+  font-family:var(--mono);font-weight:600;font-size:13px;color:var(--signal);
+  letter-spacing:.06em;flex:none;padding-top:4px;
+}
+h2{
+  font-family:var(--display);font-weight:700;font-size:clamp(23px,3.6vw,30px);
+  line-height:1.14;letter-spacing:-.015em;margin:0;text-wrap:balance;
+}
+.lede{color:var(--ink-2);margin:0 0 26px 40px;max-width:66ch;font-size:16.5px}
+@media (max-width:560px){.lede{margin-left:0}}
+h3{
+  font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:-.005em;
+  margin:30px 0 10px;
+}
+p{margin:0 0 14px;max-width:70ch}
+strong{font-weight:600}
+
+/* ---- code + mono ---- */
+code{font-family:var(--mono);font-size:.86em;background:var(--wash);padding:1px 5px;border-radius:3px}
+pre{
+  font-family:var(--mono);font-size:12.5px;line-height:1.6;
+  background:var(--field);border:1px solid var(--rule);border-left:3px solid var(--mark);
+  padding:14px 16px;overflow-x:auto;margin:0 0 16px;border-radius:0 4px 4px 0;
+}
+pre code{background:none;padding:0;font-size:inherit}
+
+/* ---- tables ---- */
+.tw{overflow-x:auto;margin:0 0 18px;border:1px solid var(--rule);background:var(--field)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);text-align:left;padding:11px 14px;border-bottom:2px solid var(--rule);
+  background:var(--wash);font-weight:600;
+}
+td{padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.45}
+tr:last-child td{border-bottom:none}
+td.m{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+td.lead{font-weight:600;font-family:var(--display);font-size:13.5px}
+
+/* ---- cards ---- */
+.grid{display:grid;gap:14px;margin:0 0 18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.card{
+  background:var(--field);border:1px solid var(--rule);padding:16px 18px;
+  min-width:0;border-radius:3px;
+}
+.card h4{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 9px;font-weight:600;
+}
+.card p{font-size:14.5px;margin:0 0 9px;line-height:1.5}
+.card p:last-child{margin-bottom:0}
+.card ul{margin:0;padding-left:17px;font-size:14.5px;line-height:1.55}
+.card li{margin-bottom:5px}
+.card li:last-child{margin-bottom:0}
+.card.sig{border-left:3px solid var(--signal)}
+.card.saf{border-left:3px solid var(--safe)}
+.card.mrk{border-left:3px solid var(--mark)}
+
+/* ---- callout ---- */
+.note{
+  background:var(--mark-wash);border:1px solid var(--rule);border-left:3px solid var(--mark);
+  padding:15px 18px;margin:0 0 18px;font-size:15px;
+}
+.note p{margin:0;max-width:none}
+.note .lbl{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--mark);font-weight:600;display:block;margin-bottom:6px;
+}
+.note.warn{background:var(--signal-wash);border-left-color:var(--signal)}
+.note.warn .lbl{color:var(--signal)}
+
+/* ---- pills ---- */
+.pill{
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:2px;font-weight:600;white-space:nowrap;display:inline-block;
+}
+.p-lock{background:var(--signal-wash);color:var(--signal);border:1px solid var(--signal)}
+.p-rev{background:var(--safe-wash);color:var(--safe);border:1px solid var(--safe)}
+.p-exp{background:var(--wash);color:var(--ink-2);border:1px solid var(--ink-3)}
+
+/* ---- figures ---- */
+figure{margin:0 0 22px}
+figure svg{display:block;width:100%;max-width:100%;height:auto;color:var(--ink)}
+figcaption{
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);line-height:1.5;
+  margin-top:9px;padding-left:2px;
+}
+.figbox{background:var(--field);border:1px solid var(--rule);padding:18px 16px;overflow-x:auto}
+
+/* ---- checklist ---- */
+.chk{list-style:none;padding:0;margin:0 0 16px;font-size:14.5px}
+.chk li{
+  padding:8px 0 8px 28px;border-bottom:1px solid var(--rule);position:relative;line-height:1.5;
+}
+.chk li:last-child{border-bottom:none}
+.chk li::before{
+  content:"";position:absolute;left:2px;top:12px;width:12px;height:12px;
+  border:1.5px solid var(--ink-3);border-radius:2px;
+}
+
+/* ---- toc ---- */
+.toc{
+  background:var(--field);border:1px solid var(--rule);padding:20px 22px;margin:28px 0 0;
+}
+.toc ol{
+  margin:0;padding:0;list-style:none;columns:2;column-gap:32px;
+  font-family:var(--mono);font-size:12.5px;line-height:2;
+}
+@media (max-width:560px){.toc ol{columns:1}}
+.toc a{color:var(--ink);text-decoration:none;display:block;border-bottom:1px solid transparent}
+.toc a:hover{border-bottom-color:var(--ink-3)}
+.toc .n{color:var(--signal);font-weight:600;margin-right:9px}
+
+a{color:var(--mark)}
+a:focus-visible,.toc a:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+
+/* ---- print ---- */
+@media print{
+  :root{
+    --paper:#fff;--field:#fff;--ink:#000;--ink-2:#333;--ink-3:#555;
+    --rule:#bbb;--wash:#f0f0f0;
+    --signal:#8a2f1c;--safe:#0f4a41;--mark:#1d3a57;
+    --signal-wash:#fff;--safe-wash:#fff;--mark-wash:#f6f6f6;
+    color-scheme:light;
+  }
+  body{font-size:10.5pt;line-height:1.45}
+  .wrap{max-width:none;padding:0}
+  .noprint{display:none!important}
+  section{break-inside:avoid;padding-block:20px}
+  h2,h3{break-after:avoid}
+  figure,.card,.tw,.note,pre{break-inside:avoid}
+  .mast{padding-top:0}
+  .toc{break-after:page}
+  a{color:#000;text-decoration:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker">Venture OS · Reference Edition</p>
+  <h1>Operator's Field Manual</h1>
+  <p class="sub">The engineering practice behind Arena, written in the vocabulary the industry
+  already uses for it — and traced through to the business decisions each piece protects.</p>
+  <div class="meta">
+    <span>REV 2026-10-20</span>
+    <span>ARENA · ASS · VENTURE-OS</span>
+    <span>PRINT: ⌘P</span>
+  </div>
+</header>
+
+<nav class="toc noprint" aria-label="Contents">
+  <ol>
+    <li><a href="#s1"><span class="n">01</span>Translation Table</a></li>
+    <li><a href="#s2"><span class="n">02</span>The Build Map</a></li>
+    <li><a href="#s3"><span class="n">03</span>Engineering → Business</a></li>
+    <li><a href="#s4"><span class="n">04</span>The Decision Ladder</a></li>
+    <li><a href="#s5"><span class="n">05</span>The Gate Pipeline</a></li>
+    <li><a href="#s6"><span class="n">06</span>Routing Work</a></li>
+    <li><a href="#s7"><span class="n">07</span>The Session Loop</a></li>
+    <li><a href="#s8"><span class="n">08</span>Standing Practice</a></li>
+    <li><a href="#s9"><span class="n">09</span>Quick Reference</a></li>
+    <li><a href="#s10"><span class="n">10</span>The Ladder Out</a></li>
+  </ol>
+</nav>
+
+<!-- ============ 01 ============ -->
+<section id="s1">
+  <div class="shead"><span class="snum">01</span><h2>Translation Table</h2></div>
+  <p class="lede">You have independently reinvented a large amount of named professional
+  practice. The gap is not capability — it is that nobody hiring can recognise your work from
+  your own names for it. Learn the right-hand column.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:26%">Your name</th><th style="width:30%">Industry name</th><th>Why it carries weight</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="m">10-CANON/DECISIONS/</td>
+          <td class="lead">Architecture Decision Records</td>
+          <td>A documented pattern since 2011 — status, context, decision, consequences. Yours maps exactly and adds a reversibility class most teams never bother with.</td>
+        </tr>
+        <tr>
+          <td class="m">REVERSIBLE / LOCKED</td>
+          <td class="lead">One-way vs two-way doors</td>
+          <td>Amazon's framing for decision cost. Knowing which door you are standing in front of is most of what seniority means.</td>
+        </tr>
+        <tr>
+          <td class="m">OPS-1 escalation</td>
+          <td class="lead">Cost-aware model routing</td>
+          <td>Routing work to the cheapest sufficient model by consequence. A live, scarce AI-infrastructure skill.</td>
+        </tr>
+        <tr>
+          <td class="m">Firewall Doctrine</td>
+          <td class="lead">Policy as code</td>
+          <td>Constraints compiled into the system instead of written in a memo. Regulated-industry AI teams hire for exactly this.</td>
+        </tr>
+        <tr>
+          <td class="m">STATUS BLOCK</td>
+          <td class="lead">Schema-constrained output</td>
+          <td>Forcing agents to emit parseable results rather than prose. Core agent engineering.</td>
+        </tr>
+        <tr>
+          <td class="m">G2 compile gate</td>
+          <td class="lead">CI gate</td>
+          <td>Automated pass/fail before anything enters the pool.</td>
+        </tr>
+        <tr>
+          <td class="m">G3 bot playtest</td>
+          <td class="lead">Property-based testing</td>
+          <td>Asserting a property holds (a real skill gradient exists) rather than checking fixed outputs.</td>
+        </tr>
+        <tr>
+          <td class="m">G4 quality scoring</td>
+          <td class="lead">LLM-as-judge evaluation</td>
+          <td>The dominant method for scoring non-deterministic output. The single most in-demand skill on this list.</td>
+        </tr>
+        <tr>
+          <td class="m">G5 provenance.json</td>
+          <td class="lead">Supply-chain provenance / SBOM</td>
+          <td>License and origin tracking for every generated artifact.</td>
+        </tr>
+        <tr>
+          <td class="m">G6 spot-gate</td>
+          <td class="lead">Human-in-the-loop review queue</td>
+          <td>Reviewing only the borderline cases instead of everything. How HITL scales.</td>
+        </tr>
+        <tr>
+          <td class="m">_os/venture_skeleton</td>
+          <td class="lead">Project scaffolding</td>
+          <td>Reusable templates that bootstrap new work. The cookiecutter pattern.</td>
+        </tr>
+        <tr>
+          <td class="m">RUNWAY / PAYLOAD</td>
+          <td class="lead">Runbook vs ticket</td>
+          <td>Procedure separated from task. Standard operations discipline.</td>
+        </tr>
+        <tr>
+          <td class="m">PR-3 sim/view split</td>
+          <td class="lead">Headless core, server-authoritative</td>
+          <td>Pure logic separable from rendering so the server can re-run it. Classic distributed-systems design.</td>
+        </tr>
+        <tr>
+          <td class="m">PR-1 seeded PRNG</td>
+          <td class="lead">Deterministic replay</td>
+          <td>Same inputs, same output, always. The foundation of reproducible debugging.</td>
+        </tr>
+        <tr>
+          <td class="m">PR-4 version keying</td>
+          <td class="lead">Schema versioning / data lineage</td>
+          <td>Preventing silent corruption of historical data when logic changes underneath it.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">How to use this</span>
+    <p>Not jargon for its own sake. These phrases are what recruiters search, what job
+    descriptions list, and what an interviewer recognises in four seconds. "I keep a folder of
+    rulings" and "I maintain ADRs with a reversibility classification" describe the same files
+    and land completely differently.</p>
+  </div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section id="s2">
+  <div class="shead"><span class="snum">02</span><h2>The Build Map</h2></div>
+  <p class="lede">Five chains. One root. Everything downstream inherits the shape of F1, which is
+  why it was frozen before anything else was written.</p>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 800 400" role="img" aria-label="Dependency map: F1 the GameModule contract is the root; F2, F3 and F4 depend on it; the runtime chain R1 to R4 depends on F1 through F3; the factory chain G1 to G7 depends on F1; the lore chain is gated on human-authored L1; the compliance chain runs independently.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ars" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--signal)"/>
+          </marker>
+        </defs>
+
+        <!-- tier labels -->
+        <text x="8" y="22" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.4">ROOT</text>
+        <text x="196" y="22" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.4">FOUNDATION</text>
+        <text x="420" y="22" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.4">SYSTEMS</text>
+        <line x1="0" y1="30" x2="800" y2="30" stroke="var(--rule)" stroke-width="1"/>
+
+        <!-- F1 root -->
+        <rect x="8" y="118" width="150" height="62" fill="var(--signal-wash)" stroke="var(--signal)" stroke-width="2" rx="3"/>
+        <text x="83" y="143" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" fill="var(--signal)">F1</text>
+        <text x="83" y="161" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--signal)">CONTRACT · FROZEN</text>
+
+        <!-- foundation -->
+        <rect x="212" y="58" width="130" height="40" fill="none" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="277" y="83" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">F2 schema</text>
+        <rect x="212" y="110" width="130" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3" rx="3"/>
+        <text x="277" y="135" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">F3 shell</text>
+        <rect x="212" y="162" width="130" height="40" fill="none" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="277" y="187" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">F4 games</text>
+
+        <!-- arrows F1 -> F -->
+        <path d="M158,142 L185,142 L185,78 L208,78" fill="none" stroke="var(--signal)" stroke-width="1.6" marker-end="url(#ars)"/>
+        <path d="M158,149 L208,130" fill="none" stroke="var(--signal)" stroke-width="1.6" marker-end="url(#ars)"/>
+        <path d="M158,156 L185,156 L185,182 L208,182" fill="none" stroke="var(--signal)" stroke-width="1.6" marker-end="url(#ars)"/>
+
+        <!-- runtime -->
+        <rect x="420" y="52" width="200" height="52" fill="var(--wash)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="520" y="73" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">R1–R4 RUNTIME</text>
+        <text x="520" y="90" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)">orchestrate · replay · rank</text>
+        <path d="M346,78 L416,78" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+        <!-- factory -->
+        <rect x="420" y="124" width="200" height="52" fill="var(--wash)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="520" y="145" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">G1–G7 FACTORY</text>
+        <text x="520" y="162" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)">generate · gate · promote</text>
+        <path d="M346,182 L385,182 L385,150 L416,150" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+        <!-- separate tracks -->
+        <line x1="0" y1="232" x2="800" y2="232" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 3"/>
+        <text x="8" y="256" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.4">INDEPENDENT TRACKS</text>
+
+        <rect x="8" y="276" width="150" height="46" fill="none" stroke="var(--mark)" stroke-width="1.6" rx="3"/>
+        <text x="83" y="295" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="var(--mark)">L1 BIBLE</text>
+        <text x="83" y="311" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--mark)">human-authored</text>
+        <path d="M158,299 L208,299" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+        <rect x="212" y="276" width="130" height="46" fill="none" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="277" y="304" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">L2–L5 lore</text>
+
+        <rect x="420" y="276" width="200" height="46" fill="none" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="520" y="295" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">C1–C4 COMPLIANCE</text>
+        <text x="520" y="311" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-3)">runs in parallel, gates activation</text>
+
+        <!-- legend -->
+        <line x1="648" y1="286" x2="676" y2="286" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>
+        <text x="684" y="290" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)">next up</text>
+        <rect x="648" y="302" width="28" height="12" fill="var(--signal-wash)" stroke="var(--signal)" stroke-width="1.4"/>
+        <text x="684" y="312" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)">frozen</text>
+      </svg>
+    </div>
+    <figcaption>F1 blocks almost everything. Changing it after freeze means re-notifying every
+    downstream consumer — which is why it was ruled before a line of F2 was written.</figcaption>
+  </figure>
+
+  <div class="note warn">
+    <span class="lbl">The rule this encodes</span>
+    <p>Freeze the interface before building against it. A contract settled early costs an hour;
+    the same contract settled after three modules exist costs a rewrite of all three. Most
+    engineers learn this from the rewrite.</p>
+  </div>
+</section>
+
+<!-- ============ 03 ============ -->
+<section id="s3">
+  <div class="shead"><span class="snum">03</span><h2>Engineering → Business</h2></div>
+  <p class="lede">This is the section that makes you an FDE rather than a coder. Every technical
+  ruling traces to a business or legal requirement. Being able to draw that line out loud is the
+  interview.</p>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 800 330" role="img" aria-label="Trace diagram: each engineering ruling on the left connects to the business or legal outcome it protects on the right. Deterministic replay protects prize integrity. Version keying protects rank integrity. Cold start thresholds protect regulatory defensibility. Provenance protects against IP liability. Bot playtesting produces skill-gradient evidence. Human spot gates allow scaling without a review bottleneck.">
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--mark)"/>
+          </marker>
+        </defs>
+        <text x="8" y="20" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.4">ENGINEERING RULING</text>
+        <text x="470" y="20" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.4">WHAT IT PROTECTS</text>
+        <line x1="0" y1="28" x2="800" y2="28" stroke="var(--rule)"/>
+
+        <!-- rows -->
+        <g font-family="IBM Plex Mono, monospace" font-size="11.5">
+          <text x="8" y="60" fill="currentColor">PR-1/2/3 deterministic replay</text>
+          <path d="M300,56 L466,56" stroke="var(--mark)" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <text x="474" y="60" fill="var(--mark)" font-weight="600">Prize integrity · anti-cheat</text>
+          <text x="474" y="74" fill="var(--ink-3)" font-size="10">server replays the log; the client only makes a claim</text>
+
+          <text x="8" y="110" fill="currentColor">PR-4 version keying</text>
+          <path d="M300,106 L466,106" stroke="var(--mark)" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <text x="474" y="110" fill="var(--mark)" font-weight="600">Rank integrity</text>
+          <text x="474" y="124" fill="var(--ink-3)" font-size="10">rank drives eligibility; a rebaseline corrupts it</text>
+
+          <text x="8" y="160" fill="currentColor">PR-5 cold-start threshold</text>
+          <path d="M300,156 L466,156" stroke="var(--mark)" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <text x="474" y="160" fill="var(--mark)" font-weight="600">Regulatory defensibility</text>
+          <text x="474" y="174" fill="var(--ink-3)" font-size="10">rank built on real play, never synthetic priors</text>
+
+          <text x="8" y="210" fill="currentColor">G5 provenance.json</text>
+          <path d="M300,206 L466,206" stroke="var(--mark)" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <text x="474" y="210" fill="var(--mark)" font-weight="600">Zero IP liability</text>
+          <text x="474" y="224" fill="var(--ink-3)" font-size="10">every artifact ships its licence or stays out</text>
+
+          <text x="8" y="260" fill="currentColor">G3 bot playtest</text>
+          <path d="M300,256 L466,256" stroke="var(--mark)" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <text x="474" y="260" fill="var(--mark)" font-weight="600">Skill-over-chance evidence</text>
+          <text x="474" y="274" fill="var(--ink-3)" font-size="10">feeds C3, which feeds the attorney brief</text>
+
+          <text x="8" y="310" fill="currentColor">G6 human spot-gate</text>
+          <path d="M300,306 L466,306" stroke="var(--mark)" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <text x="474" y="310" fill="var(--mark)" font-weight="600">Scale without a bottleneck</text>
+          <text x="474" y="324" fill="var(--ink-3)" font-size="10">a human reviews only what the gates could not decide</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>No ruling here exists for engineering elegance. Each one is the technical form of
+    a commercial or legal constraint.</figcaption>
+  </figure>
+
+  <h3>The sentence that carries this in an interview</h3>
+  <p>"The platform's legal exposure turns on whether skill predominates over chance. That is not
+  a policy question I can answer with a document — it has to be a property of the system. So
+  scoring is deterministic and server-replayed, rank only accrues from verified real play above a
+  participation threshold, and the bot harness produces a durable evidentiary record of the skill
+  gradient. The compliance artifact is an output of the build, not a thing written alongside it."</p>
+
+  <div class="grid g3">
+    <div class="card sig">
+      <h4>Ecosystem gating</h4>
+      <p>Five value-tiers (A–E), walled from each other, each with its own legal surface. A ships
+      free with no gate. E may never ship. Containment by design.</p>
+    </div>
+    <div class="card sig">
+      <h4>Eligibility ≠ entitlement</h4>
+      <p>Status makes a player eligible. It never entitles them to a payout and never converts to
+      currency. One sentence that keeps the whole credit surface out of securities territory.</p>
+    </div>
+    <div class="card sig">
+      <h4>Audience ≠ prize cost</h4>
+      <p>Broadcast reach stays decoupled from prize liability. The HQ Trivia lesson: when
+      viewership drives cost, growth is the thing that kills you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section id="s4">
+  <div class="shead"><span class="snum">04</span><h2>The Decision Ladder</h2></div>
+  <p class="lede">The most expensive habit in solo building is treating a cheap decision like an
+  expensive one. Classify first, then spend accordingly.</p>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 800 260" role="img" aria-label="Three-step ladder of decision cost. Reversible decisions cost under an hour to undo and get ten minutes at low effort. Expensive decisions require rework and get a real session. Locked decisions require a rewrite and get maximum effort with an ADR.">
+        <line x1="0" y1="226" x2="800" y2="226" stroke="var(--rule)" stroke-width="1.5"/>
+
+        <!-- step 1 -->
+        <rect x="30" y="140" width="210" height="84" fill="var(--safe-wash)" stroke="var(--safe)" stroke-width="2" rx="3"/>
+        <text x="46" y="164" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="var(--safe)">REVERSIBLE</text>
+        <text x="46" y="181" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--safe)">undo &lt; 1 hour</text>
+
+        <!-- step 2 -->
+        <rect x="266" y="106" width="210" height="118" fill="var(--wash)" stroke="currentColor" stroke-width="2" rx="3"/>
+        <text x="282" y="130" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="currentColor">EXPENSIVE</text>
+        <text x="282" y="148" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)">undo = rework</text>
+
+        <!-- step 3 -->
+        <rect x="502" y="36" width="268" height="188" fill="var(--signal-wash)" stroke="var(--signal)" stroke-width="2" rx="3"/>
+        <text x="518" y="60" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="var(--signal)">LOCKED</text>
+        <text x="518" y="78" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--signal)">undo = rewrite</text>
+
+        <!-- spend labels -->
+        <text x="46" y="256" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-2)">10 min · low effort</text>
+        <text x="282" y="256" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-2)">real session · high effort</text>
+        <text x="518" y="256" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-2)">max effort · write the ADR · sleep on it</text>
+
+        <!-- examples -->
+        <text x="518" y="104" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--signal)">PR-2 fixed timestep</text>
+        <text x="518" y="122" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--signal)">PR-3 sim/view split</text>
+        <text x="518" y="140" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--signal)">PR-4 version keying</text>
+        <text x="518" y="158" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--signal)">CREDIT-1 two-rail</text>
+        <text x="518" y="176" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--signal)">GTM-2 decoupling</text>
+
+        <text x="282" y="172" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-2)">GTM-1 Liberation Run</text>
+        <text x="282" y="190" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-2)">PR-1 PRNG choice</text>
+
+        <text x="46" y="203" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--safe)">naming · PR-5 · PR-6</text>
+        <text x="46" y="218" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--safe)">OPS-1/2/3 · CP-0</text>
+      </svg>
+    </div>
+    <figcaption>Height is the cost of being wrong. The failure mode is spending ladder-three
+    deliberation on a ladder-one decision — the naming question sat open for three months and
+    was always a find-and-replace.</figcaption>
+  </figure>
+
+  <h3>The ADR template</h3>
+  <pre><code># &lt;ID&gt; — &lt;short title&gt;
+
+**Ruled:** YYYY-MM-DD · **Reversibility:** REVERSIBLE | EXPENSIVE | LOCKED
+**Undo cost:** &lt;hours, or "rewrite"&gt;
+**Confidence:** HIGH | MEDIUM | LOW
+
+## Ruling
+&lt;one paragraph, unambiguous, written as a rule not a discussion&gt;
+
+## Why
+&lt;the reasoning, so it is not relitigated in six weeks&gt;
+
+## Downstream
+&lt;what now assumes this is true&gt;</code></pre>
+
+  <div class="note">
+    <span class="lbl">Provenance discipline</span>
+    <p>Record what <em>you</em> decided separately from what an assistant proposed. Six pre-rulings
+    sat for eight weeks reading as frozen when they had only ever been suggested with defaults.
+    An unruled default that everything is built on is the central unsolved problem in
+    agent-assisted engineering — and knowing that firsthand is worth saying out loud.</p>
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section id="s5">
+  <div class="shead"><span class="snum">05</span><h2>The Gate Pipeline</h2></div>
+  <p class="lede">Generate freely at the edges, gate hard in the middle, reserve human judgement
+  for taste and canon. This is a defensible agent-system design philosophy and it is worth being
+  able to state in one breath.</p>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 800 230" role="img" aria-label="Funnel: many generated candidates enter on the left, pass through a compile gate, a bot playtest gate, a quality score gate and a provenance gate, then a human spot gate reviews only borderline cases, and a small number of games reach the live pool.">
+        <defs>
+          <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- funnel shape -->
+        <path d="M20,34 L700,88 L700,142 L20,196 Z" fill="var(--wash)" stroke="none" opacity="0.55"/>
+
+        <text x="20" y="22" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.3">OVER-PRODUCE</text>
+        <text x="300" y="22" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.3">FILTER AGGRESSIVELY</text>
+        <text x="648" y="22" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)" letter-spacing="1.3">PROMOTE</text>
+
+        <!-- G1 -->
+        <rect x="20" y="86" width="86" height="58" fill="var(--field)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+        <text x="63" y="109" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">G1</text>
+        <text x="63" y="126" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-3)">generate</text>
+
+        <!-- gates -->
+        <g font-family="IBM Plex Mono, monospace">
+          <rect x="140" y="86" width="74" height="58" fill="var(--field)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+          <text x="177" y="108" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">G2</text>
+          <text x="177" y="124" text-anchor="middle" font-size="9" fill="var(--ink-3)">compiles?</text>
+
+          <rect x="246" y="86" width="74" height="58" fill="var(--field)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+          <text x="283" y="108" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">G3</text>
+          <text x="283" y="124" text-anchor="middle" font-size="9" fill="var(--ink-3)">skill gap?</text>
+
+          <rect x="352" y="86" width="74" height="58" fill="var(--field)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+          <text x="389" y="108" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">G4</text>
+          <text x="389" y="124" text-anchor="middle" font-size="9" fill="var(--ink-3)">any good?</text>
+
+          <rect x="458" y="86" width="74" height="58" fill="var(--field)" stroke="currentColor" stroke-width="1.4" rx="3"/>
+          <text x="495" y="108" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">G5</text>
+          <text x="495" y="124" text-anchor="middle" font-size="9" fill="var(--ink-3)">licensed?</text>
+
+          <rect x="564" y="86" width="74" height="58" fill="var(--mark-wash)" stroke="var(--mark)" stroke-width="2" rx="3"/>
+          <text x="601" y="108" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--mark)">G6</text>
+          <text x="601" y="124" text-anchor="middle" font-size="9" fill="var(--mark)">human</text>
+
+          <rect x="670" y="86" width="110" height="58" fill="var(--safe-wash)" stroke="var(--safe)" stroke-width="2" rx="3"/>
+          <text x="725" y="109" text-anchor="middle" font-size="12" font-weight="600" fill="var(--safe)">LIVE POOL</text>
+          <text x="725" y="126" text-anchor="middle" font-size="9" fill="var(--safe)">G7 telemetry</text>
+        </g>
+
+        <!-- connectors -->
+        <g stroke="currentColor" stroke-width="1.3" fill="none">
+          <path d="M106,115 L136,115" marker-end="url(#ar3)"/>
+          <path d="M214,115 L242,115" marker-end="url(#ar3)"/>
+          <path d="M320,115 L348,115" marker-end="url(#ar3)"/>
+          <path d="M426,115 L454,115" marker-end="url(#ar3)"/>
+          <path d="M532,115 L560,115" marker-end="url(#ar3)"/>
+          <path d="M638,115 L666,115" marker-end="url(#ar3)"/>
+        </g>
+
+        <!-- reject arrows -->
+        <g stroke="var(--signal)" stroke-width="1.1" fill="none" stroke-dasharray="3 2.5">
+          <path d="M177,144 L177,172"/><path d="M283,144 L283,172"/>
+          <path d="M389,144 L389,172"/><path d="M495,144 L495,172"/>
+        </g>
+        <line x1="160" y1="172" x2="512" y2="172" stroke="var(--signal)" stroke-width="1.1" stroke-dasharray="3 2.5"/>
+        <text x="336" y="190" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--signal)">rejected — no human time spent</text>
+
+        <!-- feedback -->
+        <path d="M725,146 L725,210 L63,210 L63,148" stroke="var(--safe)" stroke-width="1.2" fill="none" stroke-dasharray="4 3"/>
+        <text x="394" y="224" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--safe)">winners become mutation parents · losers retire</text>
+      </svg>
+    </div>
+    <figcaption>The human appears once, late, and only on what the automated gates could not
+    decide. That placement is the whole design — it is what lets supply scale past one person's
+    attention.</figcaption>
+  </figure>
+
+  <div class="grid g2">
+    <div class="card mrk">
+      <h4>Where to put a human</h4>
+      <p>Not at the start (you become the bottleneck) and not at the end (you rubber-stamp). Put
+      them at the one judgement the system genuinely cannot make — here, taste and canon.</p>
+    </div>
+    <div class="card mrk">
+      <h4>Why rejection is cheap</h4>
+      <p>Each gate is ordered by cost: compile is cents, bot playtest is seconds, the LLM judge
+      costs real money. Cheap gates first means expensive gates see fewer candidates.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 ============ -->
+<section id="s6">
+  <div class="shead"><span class="snum">06</span><h2>Routing Work</h2></div>
+  <p class="lede">Two separate dials, routinely confused. Model is how much it knows. Effort is
+  how hard it tries. Cost follows consequence.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:22%">Symptom</th><th style="width:26%">Dial</th><th>Reasoning</th></tr></thead>
+      <tbody>
+        <tr><td class="m">Had full context,<br>tried, still wrong</td><td class="lead">Raise the <em>model</em></td><td>Capability ceiling. More effort on the same weights produces a more thorough wrong answer.</td></tr>
+        <tr><td class="m">Skipped files,<br>stopped early</td><td class="lead">Raise the <em>effort</em></td><td>Effort governs files read, tools run, steps taken before checking back.</td></tr>
+        <tr><td class="m">Confused output,<br>wrong target</td><td class="lead">Fix the <em>prompt</em></td><td>Neither dial rescues an unclear question. Most failures are here.</td></tr>
+        <tr><td class="m">Expensive and<br>pre-reduced</td><td class="lead">Max effort, once</td><td>Only after cheap passes have narrowed the surface. Never open at max on an unreduced problem.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g3">
+    <div class="card saf">
+      <h4>Low effort</h4>
+      <p>Mechanical work. File moves, enumeration, status updates, a rename. Anything a diff can
+      verify at a glance.</p>
+    </div>
+    <div class="card">
+      <h4>Medium effort</h4>
+      <p>Real work with a known shape. Writing a test, a staged migration, a build against a
+      frozen spec. The default for most sessions.</p>
+    </div>
+    <div class="card sig">
+      <h4>Max effort</h4>
+      <p>Changes to gates or decisions. Architecture that becomes load-bearing. Only on a surface
+      that cheaper passes have already reduced.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Carried over</span>
+    <p>Effort does not transfer between sessions. Planning at max and then executing at low gives
+    you a careful plan carried out carelessly. Put the thinking in a file, and give the execution
+    session the effort the execution actually needs.</p>
+  </div>
+</section>
+
+<!-- ============ 07 ============ -->
+<section id="s7">
+  <div class="shead"><span class="snum">07</span><h2>The Session Loop</h2></div>
+  <p class="lede">Build for interruption, not for discipline. The old protocol put the expensive
+  step at the moment of least energy, so it stopped happening and five weeks of rulings never
+  landed in a file.</p>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 800 250" role="img" aria-label="Two session protocols compared. The broken version has a cheap open and an expensive close, so the close is skipped and state drifts. The fixed version has an expensive open and a cheap one-line close, so a missed session costs one line instead of weeks.">
+        <!-- broken -->
+        <text x="8" y="20" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--signal)" letter-spacing="1.3">BROKEN — COST AT THE WRONG END</text>
+        <rect x="8" y="34" width="120" height="44" fill="none" stroke="var(--ink-3)" stroke-width="1.3" rx="3"/>
+        <text x="68" y="54" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">OPEN</text>
+        <text x="68" y="69" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">cheap</text>
+
+        <rect x="168" y="34" width="190" height="44" fill="none" stroke="var(--ink-3)" stroke-width="1.3" rx="3"/>
+        <text x="263" y="54" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">WORK</text>
+        <text x="263" y="69" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">energy spent here</text>
+
+        <rect x="398" y="26" width="200" height="60" fill="var(--signal-wash)" stroke="var(--signal)" stroke-width="2" rx="3"/>
+        <text x="498" y="50" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="var(--signal)">CLOSE — EXPENSIVE</text>
+        <text x="498" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--signal)">regenerate, re-upload, by hand</text>
+        <text x="498" y="79" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--signal)">at the lowest-energy moment</text>
+
+        <path d="M598,56 L646,56" stroke="var(--signal)" stroke-width="1.4" stroke-dasharray="3 2" fill="none"/>
+        <text x="654" y="52" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--signal)">skipped</text>
+        <text x="654" y="66" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--signal)">→ 5 wks drift</text>
+
+        <line x1="0" y1="112" x2="800" y2="112" stroke="var(--rule)"/>
+
+        <!-- fixed -->
+        <text x="8" y="140" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--safe)" letter-spacing="1.3">FIXED — COST WHERE THE ENERGY IS</text>
+        <rect x="8" y="154" width="200" height="60" fill="var(--safe-wash)" stroke="var(--safe)" stroke-width="2" rx="3"/>
+        <text x="108" y="178" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="var(--safe)">OPEN — EXPENSIVE</text>
+        <text x="108" y="194" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--safe)">read log, rebuild state</text>
+        <text x="108" y="207" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--safe)">report 3 lines, stop</text>
+
+        <rect x="248" y="162" width="190" height="44" fill="none" stroke="var(--ink-3)" stroke-width="1.3" rx="3"/>
+        <text x="343" y="182" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">WORK</text>
+        <text x="343" y="197" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">rulings land immediately</text>
+
+        <rect x="478" y="162" width="130" height="44" fill="var(--safe-wash)" stroke="var(--safe)" stroke-width="1.6" rx="3"/>
+        <text x="543" y="182" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="var(--safe)">CLOSE</text>
+        <text x="543" y="197" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--safe)">one line · 10 sec</text>
+
+        <path d="M608,184 L652,184" stroke="var(--safe)" stroke-width="1.4" fill="none"/>
+        <text x="660" y="180" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--safe)">missed close</text>
+        <text x="660" y="194" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--safe)">= 1 line lost</text>
+
+        <text x="8" y="240" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-3)">Cheap capture at close · expensive synthesis at open · rulings written the moment they are made, never batched</text>
+      </svg>
+    </div>
+    <figcaption>The same total work, moved to where the energy actually is. A missed session now
+    costs one log line instead of a month of unrecorded architecture.</figcaption>
+  </figure>
+
+  <div class="grid g2">
+    <div class="card saf">
+      <h4>Close — ten seconds</h4>
+      <pre style="margin:0;border:none;border-left:none;background:none;padding:0;font-size:11.5px"><code>YYYY-MM-DD | chain | stopped at: &lt;where&gt;
+  | confused by: &lt;what, or -&gt;</code></pre>
+      <p style="margin-top:9px">Append only. Never regenerate anything at close. Commit, push, walk away.</p>
+    </div>
+    <div class="card saf">
+      <h4>Open — while fresh</h4>
+      <p>Read the last ten log lines and the capsule. Rebuild state. Report three lines: where we
+      are, what is next, what is blocked. Then stop — no project summary, no accomplishments
+      list.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section id="s8">
+  <div class="shead"><span class="snum">08</span><h2>Standing Practice</h2></div>
+  <p class="lede">What a tech role assumes you already do. None of it is difficult; all of it is
+  visible in a repo within thirty seconds.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>Version control</h4>
+      <ul>
+        <li>Atomic commits — one logical change each</li>
+        <li><code>type: summary</code> under 50 chars, blank line, then <em>why</em></li>
+        <li>Types: feat · fix · docs · test · chore · refactor</li>
+        <li>Never commit secrets; <code>.env</code> in <code>.gitignore</code> always</li>
+        <li>Branch per unit of work, merged by pull request — even solo</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Testing</h4>
+      <ul>
+        <li>Unit · integration · end-to-end</li>
+        <li>A found bug becomes a regression test so it cannot return</li>
+        <li>Watch a test fail before making it pass</li>
+        <li>CI runs them on every push, not when you remember</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Reproducibility</h4>
+      <ul>
+        <li>Pin dependencies; commit the lockfile</li>
+        <li>Deterministic builds — same input, same output</li>
+        <li>Environments described in files, not assembled by hand</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Documentation</h4>
+      <ul>
+        <li>README: what is this, how do I run it, how do I test it</li>
+        <li>ADRs capture <em>why</em>; code already shows <em>what</em></li>
+        <li>Supersede, never silently edit — a stale doc with no marker is a trap</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Risky operations</h4>
+      <ul>
+        <li>Backup first, then <em>verify the backup</em></li>
+        <li>Check preconditions before touching anything</li>
+        <li>Assert the result; never assume the command did what it said</li>
+        <li>Phases with hard stops, so a failure is contained</li>
+        <li>Never delete the original — supersede it</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Working with agents</h4>
+      <ul>
+        <li>Verification over attestation — ask for a test, not an opinion</li>
+        <li>Never let an agent grade its own output</li>
+        <li>Long instructions go in a file, read in one line</li>
+        <li>Scope locks and explicit stop conditions</li>
+        <li>Track what you decided vs what the agent proposed</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The structural fix beats the resolution</span>
+    <p>Two copies of the same repo existed for eight weeks because nothing marked the stale one.
+    The fix was not more care — it was a tombstone file in the dead repo and a shell alias that
+    makes the live one the only place you land. When you catch yourself resolving to be more
+    careful, look for the structural change instead.</p>
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section id="s9">
+  <div class="shead"><span class="snum">09</span><h2>Quick Reference</h2></div>
+  <p class="lede">The commands and contracts worth not re-deriving.</p>
+
+  <div class="grid g2">
+    <div class="card mrk">
+      <h4>Start a session</h4>
+      <pre style="margin:0"><code>arena                    # alias → cd + launch
+/effort medium
+open the ledger</code></pre>
+    </div>
+    <div class="card mrk">
+      <h4>Resume a named session</h4>
+      <pre style="margin:0"><code>claude --resume f1-contract
+# first time: claude, then /rename f1-contract
+# lookup is directory-scoped</code></pre>
+    </div>
+    <div class="card mrk">
+      <h4>Long prompt into a repo</h4>
+      <pre style="margin:0"><code>nano ./PLAN.md     # paste, ^O, Enter, ^X
+wc -l ./PLAN.md    # verify it landed whole
+# then: "Read PLAN.md and follow it exactly."</code></pre>
+    </div>
+    <div class="card mrk">
+      <h4>Before anything destructive</h4>
+      <pre style="margin:0"><code>tar -czf ~/backup-$(date +%Y%m%d-%H%M).tar.gz \
+  -C ~ &lt;dir&gt; &amp;&amp; ls -lh ~/backup-*.tar.gz
+git status --porcelain   # must be empty</code></pre>
+    </div>
+  </div>
+
+  <h3>The RUNWAY contract</h3>
+  <p>When a step causes friction, the walkthrough that unblocks it obeys all of this or it is not
+  finished being written:</p>
+  <ul class="chk">
+    <li>No preamble. Step 1 is the first thing on screen.</li>
+    <li>Assume nothing is installed and nothing is configured.</li>
+    <li>One action per step, each command in its own block.</li>
+    <li>Every step states an observable checkpoint — "you should see X".</li>
+    <li>Likely failures inline, in the step where they occur: "if you see Y instead → do Z".</li>
+    <li>Never ask a question that can be resolved by assuming the common case and saying so.</li>
+    <li>No forward references. If it is needed, it is in the step.</li>
+    <li>End with the exact next command. Never "let me know how it goes".</li>
+  </ul>
+
+  <h3>Friction log</h3>
+  <p>Every walkthrough you needed is evidence that something upstream was underspecified. Three
+  entries against the same document means that document gets amended, not walked through again.
+  The log is the deliverable; the walkthrough is the side effect.</p>
+  <pre><code>2026-10-19 | transport | pastes over ~30 lines truncate | fix: files, not pastes
+2026-10-19 | repos     | two arena copies, 8 weeks apart | fix: alias + tombstone
+2026-10-19 | bootstrap | nested repo swallowed ventures/  | fix: check inner .git first</code></pre>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+  <div class="shead"><span class="snum">10</span><h2>The Ladder Out</h2></div>
+  <p class="lede">The gap is not capability. It is that none of the capability is currently
+  visible, and the vocabulary that makes it legible was missing. Section 01 fixed the second
+  problem. This fixes the first.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:14%">Week</th><th style="width:28%">Artifact</th><th>Why it moves the needle</th></tr></thead>
+      <tbody>
+        <tr><td class="m">01</td><td class="lead">Public repo · green CI · first test</td><td>Moves you from "has a project" to "has shipped". This is the only threshold that matters and it takes one evening.</td></tr>
+        <tr><td class="m">02</td><td class="lead">A deployed URL</td><td>"I have never deployed anything" is a harder objection than any gap in reasoning.</td></tr>
+        <tr><td class="m">03</td><td class="lead">One scored eval</td><td>A G4 gate converted into a number that moves when quality changes. The scarcest skill on the list and you are one step from it.</td></tr>
+        <tr><td class="m">04</td><td class="lead">An architecture write-up</td><td>Not marketing. An engineering post on the gate design and why each gate exists where it does.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Roles this portfolio opens</h3>
+  <div class="grid g3">
+    <div class="card"><h4>Closest fit</h4><p>Forward Deployed Engineer · Applied AI Engineer · AI Solutions Architect</p></div>
+    <div class="card"><h4>Adjacent, easier entry</h4><p>Agent Infrastructure Engineer · AI Evaluation Engineer · Solutions Engineer</p></div>
+    <div class="card"><h4>Also true</h4><p>Developer Experience · Technical Program Manager, AI</p></div>
+  </div>
+
+  <div class="note">
+    <span class="lbl">The scarce thing you already have</span>
+    <p>In a field whose dominant failure mode is accepting fluent output uncritically, the habit
+    of pushing back on a confident answer — and being right — is rarer than any technical skill on
+    this page. Keep doing it.</p>
+  </div>
+</section>
+
+</div>
+
+</body></html>
