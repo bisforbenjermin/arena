@@ -1,5 +1,5 @@
 # CONTEXT CAPSULE
-Updated: 261020-1 (prev: 261018-1)
+Updated: 261020-2 (prev: 261020-1)
 Keep this under one page. Rewrite at every significant direction change.
 
 ---
@@ -35,11 +35,13 @@ In parallel (non-blocking): G1 can start now (only needs F1). L1 is yours to wri
 - GTM-1 Liberation Run — RULED 2026-07-30
 - GTM-2 Broadcast/prize decoupling — RULED 2026-07-30
 - CP-0 Solvency gate — RULED 2026-07-30
-- OPS-1 Escalation rule — RULED 2026-07-19 (stub — Why/Downstream truncated)
+- OPS-1 Escalation rule — RULED 2026-07-19
+- OPS-2 Supersede, never edit in place · OPS-3 Chat labels — RULED 2026-08-10
+- CREDIT-1 Two-rail credits (Keys / Vault Points) — RULED 2026-07-30, ratified 2026-10-20
 
 **Open items:**
-- OPS-2, OPS-3 — content never received, files not written
-- OPS-1 — stub, truncated; needs Why + Downstream
+- GTM-1 vs. your recent remarks — venues are "one GTM strategy of many"; a grand-quest launch is under consideration. Your call.
+- OPS-4 operating board + cold critique — PROPOSED, parked in 00-COMMAND/PROPOSED/.
 
 **Three things open on purpose:** naming decision, C4-ADDENDUM-1 missing, protocol version ambiguity. None block F3.
 
@@ -53,8 +55,8 @@ In parallel (non-blocking): G1 can start now (only needs F1). L1 is yours to wri
 ---
 
 ## LAST SESSION
+261020 — Canon: OPS-1 completed (truncated stub archived), OPS-2 + OPS-3 landed; CREDIT-1 ratified; CLAUDE.md (Claude Code ledger protocol) added at repo root; OPS-4 board parked as PROPOSED. F3 still blocked on the auth + frontend picks.
+
 261020 — RECON re-run; determinism gate (tests/determinism.ts) confirmed passing (committed 261019). Read all F3 board decisions: Rail 1 key gate and CP-0 prize block are settled; auth provider and frontend framework are unruled. F3 build blocked on those two calls.
 
 261019 — Determinism gate written and committed: tests/determinism.ts; PR-1/PR-2/PR-3 PASS, PR-4 PARTIAL (no exported version constant), PR-5 PASS, F2 claim/verified PASS. SAFE TO BUILD F3.
-
-261018 — F4 built: precision-tap (tap/flat) + pressure-hold (hold/ramp); both provenance.json written; capsule updated. F3 is now the critical-path blocker.
