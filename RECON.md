@@ -19,7 +19,7 @@ Report first:
 Then search for stray or duplicate copies. From `$HOME`, to depth 6, pruning
 `node_modules`, `Library`, `.Trash`, `.cache`, `.venv`, find:
 
-- directories named `10-CANON`, `00-COMMAND`, `20-SPEC`, `30-BUILD`, `contracts`
+- directories named `governance/10-CANON`, `governance/00-COMMAND`, `governance/20-SPEC`, `governance/30-BUILD`, `contracts`
 - files named `CLAUDE.md`, `STATE_LEDGER.md`, `game-module.ts`, `CONTEXT_CAPSULE.md`
 - every `.git` directory
 
@@ -27,7 +27,7 @@ For each distinct repo root found, report one row:
 
 ```
 path | last commit date | commit count | has game-module.ts? | has 
-10-CANON/DECISIONS/?
+governance/10-CANON/DECISIONS/?
 ```
 
 Also report any `.git` found *inside* another repo — a nested repo is recorded by the 
@@ -57,15 +57,15 @@ relaunch from the right place.
 
 Report EXISTS or MISSING for each. Nothing else yet.
 
-- `10-CANON/DECISIONS/` — list every file inside
-- `00-COMMAND/CONTEXT_CAPSULE.md`
-- `00-COMMAND/SESSION_LOG.md`
+- `governance/10-CANON/DECISIONS/` — list every file inside
+- `governance/00-COMMAND/CONTEXT_CAPSULE.md`
+- `governance/00-COMMAND/SESSION_LOG.md`
 - `CLAUDE.md`
 
 Also report the layout: **flat** (`F1.md`, `F2.md` at root) or **numbered**
-(`00-COMMAND/`, `10-CANON/`, `20-SPEC/`).
+(`governance/00-COMMAND/`, `governance/10-CANON/`, `governance/20-SPEC/`).
 
-If `10-CANON/DECISIONS/` is MISSING or empty, say so and STOP. Without the rulings on 
+If `governance/10-CANON/DECISIONS/` is MISSING or empty, say so and STOP. Without the rulings on 
 disk
 there is nothing to verify against, and I am not interested in you checking code 
 against
@@ -154,7 +154,7 @@ regression gate for every game the Game Factory generates later.
 test: determinism gate for F4 reference games (PR-1/2/3)
 ```
 
-Append one line to `00-COMMAND/SESSION_LOG.md` if that file exists:
+Append one line to `governance/00-COMMAND/SESSION_LOG.md` if that file exists:
 
 ```
 <today> | RECON | stopped at: <verdict> | confused by: -
