@@ -1,5 +1,5 @@
 # CONTEXT CAPSULE
-Updated: 261020-2 (prev: 261020-1)
+Updated: 261020-3 (prev: 261020-2)
 Keep this under one page. Rewrite at every significant direction change.
 
 ---
@@ -25,25 +25,23 @@ In parallel (non-blocking): G1 can start now (only needs F1). L1 is yours to wri
 - F3 ⬜ PWA shell + auth + eligibility gating — NEXT
 - F4 ✅ Two reference games (precision-tap, pressure-hold)
 
-**Frozen rulings (10-CANON/DECISIONS/):**
-- PR-1 PRNG (sfc32) — RULED 2026-09-06
-- PR-2 Fixed timestep (tick at 1/60s) — RULED 2026-09-06
-- PR-3 Sim/view split — RULED 2026-09-06
-- PR-4 Version keying (contractVersion + gameVersion) — RULED 2026-09-06
-- PR-5 Cold start (200 scores / 30 players before ranking) — RULED 2026-09-06
-- PR-6 Tilt reserved — RULED 2026-09-06
-- GTM-1 Liberation Run — RULED 2026-07-30
-- GTM-2 Broadcast/prize decoupling — RULED 2026-07-30
-- CP-0 Solvency gate — RULED 2026-07-30
-- OPS-1 Escalation rule — RULED 2026-07-19
-- OPS-2 Supersede, never edit in place · OPS-3 Chat labels — RULED 2026-08-10
-- CREDIT-1 Two-rail credits (Keys / Vault Points) — RULED 2026-07-30, ratified 2026-10-20
+**Repo structure (as of 261020):**
+- Operable (CI): `contracts/` · `db/` · `games/` · `tests/` — at root
+- Governance: `governance/00-COMMAND/` · `governance/10-CANON/` · `governance/90-ARCHIVE/`
+- Legacy: `governance/_legacy/HQ/` · `governance/_legacy/arena-july/`
+
+**Frozen rulings (governance/10-CANON/DECISIONS/) — 19 files:**
+- PR-1 PRNG (sfc32) · PR-2 Fixed timestep · PR-3 Sim/view split · PR-4 Version keying · PR-5 Cold start · PR-6 Tilt reserved — RULED 2026-09-06
+- GTM-1 Liberation Run · GTM-2 Broadcast/prize decoupling · CP-0 Solvency gate · CREDIT-1 Two-rail credits — RULED 2026-07-30; CREDIT-1 ratified 2026-10-20
+- OPS-1 Escalation rule — RULED 2026-07-19; OPS-2 Supersession · OPS-3 Chat labels — RULED 2026-08-10
+- AUD-1 Investor audience · BRAND-1 Name structure · BRAND-2 Neon-noir look · BRAND-3 Core line · CANON-2 Board fold · GTM-4 Venues = one channel — RULED 2026-10-20
 
 **Open items:**
-- GTM-1 vs. your recent remarks — venues are "one GTM strategy of many"; a grand-quest launch is under consideration. Your call.
-- OPS-4 operating board + cold critique — PROPOSED, parked in 00-COMMAND/PROPOSED/.
+- World name (Freehold / Arclight / Quarterlight / Elsewhere) — blocks BRAND-1, trademark search
+- GTM-3 The First Cache — PROPOSED; needs max-weight session to supersede GTM-1
+- OPS-4 Operating board + cold critique — PROPOSED, parked in `governance/00-COMMAND/PROPOSED/`
 
-**Three things open on purpose:** naming decision, C4-ADDENDUM-1 missing, protocol version ambiguity. None block F3.
+**Three things open on purpose:** world name, C4-ADDENDUM-1 missing, protocol version ambiguity. None block F3.
 
 ---
 
@@ -55,8 +53,8 @@ In parallel (non-blocking): G1 can start now (only needs F1). L1 is yours to wri
 ---
 
 ## LAST SESSION
-261020 — Canon: OPS-1 completed (truncated stub archived), OPS-2 + OPS-3 landed; CREDIT-1 ratified; CLAUDE.md (Claude Code ledger protocol) added at repo root; OPS-4 board parked as PROPOSED. F3 still blocked on the auth + frontend picks.
+261020 — Investor brief rulings landed: AUD-1, BRAND-1..3, CANON-2, GTM-4 committed to canon; GTM-3 parked as PROPOSED. Repo consolidated: governance/ split from operable root; legacy Arena docs from HQ + arena-july brought in. Capsule regenerated.
 
-261020 — RECON re-run; determinism gate (tests/determinism.ts) confirmed passing (committed 261019). Read all F3 board decisions: Rail 1 key gate and CP-0 prize block are settled; auth provider and frontend framework are unruled. F3 build blocked on those two calls.
+261020 — Canon: OPS-1 completed, OPS-2 + OPS-3 landed; CREDIT-1 ratified; CLAUDE.md ledger protocol added; OPS-4 parked as PROPOSED.
 
-261019 — Determinism gate written and committed: tests/determinism.ts; PR-1/PR-2/PR-3 PASS, PR-4 PARTIAL (no exported version constant), PR-5 PASS, F2 claim/verified PASS. SAFE TO BUILD F3.
+261020 — RECON re-run confirmed SAFE TO BUILD F3; auth + frontend stack unruled; F3 build blocked on those two calls.
