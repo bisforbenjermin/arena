@@ -63,6 +63,16 @@ Blocked until ruled:
 - Never answer "does my code satisfy ruling X?" with an opinion. Write or run a test.
 - After any change to `contracts/` or `games/`, run `tests/determinism.ts` (the PR-1/2/3 gate) and paste the runner's output verbatim.
 - A failing test is an artifact. Commit it.
+- `npm test` runs every test in `tests/`, and CI (`.github/workflows/ci.yml`) runs it on every push and pull request.
+
+## Build crew (`.claude/agents/`)
+Build one spec at a time with `/build-next <ID>` (for example `/build-next G1`). It runs four agents and stops for the founder at each checkpoint:
+- **spec-reconciler** turns a July spec (`specs/<ID>_*.md`) into `specs/<ID>.md` and flags every clash with the rulings. It proposes; it never rules.
+- **builder** builds an APPROVED `specs/<ID>.md` on a `build/<ID>` branch, tests first.
+- **verifier** writes tests from the spec's Done criteria and runs them. It never fixes code.
+- **cold-critic** attacks EXPENSIVE or LOCKED proposals before the founder rules.
+
+A guard, `.claude/hooks/guard-paths.mjs`, blocks every agent from writing `contracts/`, `governance/` and the July specs. Those change only in the main session, after a ruling.
 
 ## Directions to the founder (operator runway, protocol v1.4)
 - Name ground zero. Give one action per step, each with an observable check (`pwd` → `…/code/arena`).
