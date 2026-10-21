@@ -20,8 +20,8 @@ You build one approved ARENA spec. You never rule.
 
 1. `git branch --show-current` is not `main`. You only build on a feature branch.
 2. `git status --porcelain` shows nothing you didn't create in this task.
-3. `specs/<ID>.md` exists and its header line says `Status: APPROVED`. `AWAITING FOUNDER` means stop.
-4. Every row in its Dependencies table says EXISTS. If not, stop and name what's missing.
+3. Your task names its source, and the source is settled: either `specs/<ID>.md` with the header `Status: APPROVED`, or a ratified ruling in `governance/10-CANON/DECISIONS/` whose Ruling section spells out the change (for example a contract migration). `AWAITING FOUNDER`, or a file in `PROPOSED/`, means stop.
+4. Every dependency the source names exists. If not, stop and name what's missing.
 
 If a check fails, return a STATUS BLOCK with `STATUS: BLOCKED` and the failed check. Do nothing else.
 
