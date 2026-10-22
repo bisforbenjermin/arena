@@ -9,6 +9,10 @@
 // Optional arguments narrow an agent further, e.g. `guard-paths.mjs tests/ evals/`
 // lets that agent write only under tests/ or evals/.
 //
+// `guard-paths.mjs --design` is the guard for /design sessions instead (a main session, not an
+// agent). In the repo it allows only governance/00-COMMAND/PROPOSED/, governance/10-CANON/DECISIONS/
+// (for /rule) and governance/90-ARCHIVE/. Files outside the repo, such as scratch scripts, pass.
+//
 // Exit 2 blocks the tool call and shows the message to the agent. Exit 0 lets it through.
 // This is a backstop, not a sandbox: Bash can still write files. The agent prompts carry the rule too.
 
@@ -24,6 +28,19 @@ try {
 if (!filePath) process.exit(0);
 
 const p = filePath.replace(/\\/g, '/');
+
+if (process.argv[2] === '--design') {
+  const root = String(process.env.CLAUDE_PROJECT_DIR || process.cwd()).replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
+  const lower = p.toLowerCase();
+  const absolute = p.startsWith('/') || /^[a-z]:\//i.test(p);
+  const inRepo = !absolute || lower === root || lower.startsWith(`${root}/`);
+  const writable = /(^|\/)governance\/(00-COMMAND\/PROPOSED|10-CANON\/DECISIONS|90-ARCHIVE)\//.test(p);
+  if (inRepo && !writable) {
+    process.stderr.write(`Blocked: a design session writes only governance/00-COMMAND/PROPOSED/, governance/10-CANON/DECISIONS/ (through /rule) and governance/90-ARCHIVE/. ${filePath} is outside that. Code, specs and contracts/ change in a build session after a ruling: start a fresh session and run /build-next.\n`);
+    process.exit(2);
+  }
+  process.exit(0);
+}
 
 const PROTECTED = [
   { re: /(^|\/)contracts\//, why: 'the F1 contract changes only after a founder ruling (OPS-1)' },
