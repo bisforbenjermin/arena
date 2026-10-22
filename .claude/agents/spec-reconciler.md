@@ -43,11 +43,12 @@ Write exactly one file: `specs/<ID>.md`. Never edit the July source; a guard blo
 `specs/<ID>.md` contains, in order:
 
 1. `# <ID> — <title>`, then one line: `Source: specs/<July file> | Reconciled: <YYYY-MM-DD> | Status: AWAITING FOUNDER`
-2. `## Conflicts`: a table with columns `# | Spec says | Canon says (file:line) | Kind | Proposed fix`.
-3. `## Dependencies`: a table with columns `Artifact | State | Path`.
-4. `## Build spec`: the July spec with every DEFAULT applied and marked inline `[RECONCILED: <why>]`. RULING items stay as written, marked `[BLOCKED: HANDOFF <n>]`.
-5. `## Done criteria`: numbered. Each one must be checkable by a command or a test. Rewrite vague ones ("a reviewer agrees") into checks, or mark them `HUMAN CHECK`.
-6. `## Out of scope`: what this build must not touch.
+2. `## Conflicts`: a table with columns `# | Spec says | Canon says (file:line) | Kind | Proposed fix`. Kind is `DEFAULT`, or `RULING H<n>`.
+3. `## Handoffs`: one `### H<n> — <topic>` per RULING item, numbered from H1, holding its HANDOFF block verbatim. Under each block, one line: `Route (PROPOSED): /design — <why>` when the call is EXPENSIVE or LOCKED to undo and has two or more defensible options, otherwise `Route (PROPOSED): rule now — <why>`. The founder picks the route. Write `None.` if there are no RULING items.
+4. `## Dependencies`: a table with columns `Artifact | State | Path`.
+5. `## Build spec`: the July spec with every DEFAULT applied and marked inline `[RECONCILED: <why>]`. RULING items stay as written, marked `[BLOCKED: H<n>]`.
+6. `## Done criteria`: numbered. Each one must be checkable by a command or a test. Rewrite vague ones ("a reviewer agrees") into checks, or mark them `HUMAN CHECK`.
+7. `## Out of scope`: what this build must not touch.
 
 ## Stop conditions
 
@@ -56,7 +57,7 @@ Write exactly one file: `specs/<ID>.md`. Never edit the July source; a guard blo
 
 ## Final message
 
-End with this block and nothing after it. Paste each HANDOFF verbatim.
+End with this block and nothing after it. Paste each HANDOFF verbatim, headed by its H<n>.
 
 ```
 STATUS BLOCK
