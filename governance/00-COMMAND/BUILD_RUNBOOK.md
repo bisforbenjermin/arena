@@ -83,7 +83,7 @@ Check: a pull request link.
 **g.** Read the pull request, merge when CI is green, then `close the arena ledger`.
 Check: the new SESSION_LOG line names the pull request.
 
-### Likely hard calls, read from the July specs (the reconciler finds the real list)
+### What to expect at each checkpoint (read from the July specs; the reconciler finds the real list)
 
 **G1 — generation agent** (an agent that writes candidate games)
 - The candidate record that every later stage (G2 to G7) reads: what a generated bundle contains, and where jobs wait between stages. F2's database has `game_pool` and `game_provenance` tables but nothing for candidates. Likely `/design`.
@@ -100,9 +100,11 @@ Check: the new SESSION_LOG line names the pull request.
 **G3 — bot playtest** (synthetic players that show whether a game rewards skill)
 - The skill-gap test: which statistic, how many seeded runs, what threshold. Its stats record becomes C3's evidence that games reward skill over chance (C3 is the compliance artifact for paid-entry contests), so changing it later strands stored evidence. Likely `/design`.
 - Who writes the strong bot. The July spec lets the generating agent write the bot for its own game, so a game could mark its own homework. Part of the same design.
+- Ask for one deliberately luck-only fixture game, so the Done criterion "a pure-luck game is rejected" has a real test.
 
 **G4 — quality scoring** (objective metrics plus a model judge)
 - Whether the judge may archive a game without your taste check (PD-8), and which model judges (not the one that generated it). Rule now, perhaps after `/critique`: weights and thresholds are cheap to re-run.
+- Start the judge from prompt P6 in `docs/employability/EMPLOYABILITY_REVIEW.md`.
 
 ## When something goes wrong
 
