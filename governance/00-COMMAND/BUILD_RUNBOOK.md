@@ -22,6 +22,22 @@ Every hard call goes round the same loop, and nothing is built until it has been
 
 **Switching models.** `/design` and `/build-next` set their own model and effort for the turn you run them in. Set the session to match first, so your follow-up questions stay on the same model: `/model fable` then `/effort max` for design, `/model opus` then `/effort high` for builds. From a terminal, `claude --model fable --effort max` (or `--model opus --effort high`) opens a fresh session already set.
 
+## Routine commands (Sonnet tier, except where the audit tier says otherwise)
+
+The loop above is for hard calls. These five are for everything that isn't: the ledger rituals and the mechanical checks that keep the canon legible. None of them rules; none of them touches `contracts/`.
+
+| Command | Does | Model |
+|---|---|---|
+| `/open` | The open ritual from CLAUDE.md: capsule, log, rulings, git, drift check, three lines. Offers a regenerated capsule if there is drift; writes it only on your yes. | Sonnet, low |
+| `/close [what moved \| outcome]` | The close ritual: one SESSION_LOG line, a check that every ruling made this session has its file, commit, push, "closed". Derives the line from the session if you give none. | Sonnet, low |
+| `/index` | Regenerates `governance/10-CANON/DECISIONS/INDEX.md`: every ruling, proposal and superseded file as a pointer table. Run it after any ruling lands. | Sonnet, low |
+| `/land` | Lands files you dropped into `_incoming/` where a `MANIFEST.md` says, stamps proposals PROPOSED, commits once. Refuses rulings (`/rule`) and contracts (`/build-next`). | Sonnet, low |
+| `/audit <tier>` | Runs one tier of `AUDIT_PROMPTS.md` (A0–A5, S2 ruling headers, S3 spec debt) through the auditor agent whose model matches the tier, saves the report to `_audit/`, commits it. Refuses A1 without A0 and A2 without A1. | by tier: Sonnet / Opus / Fable |
+
+**Ordering.** `/open` first; `/close` last. `/index` and `/audit S2` after every `/rule`. `/audit S3` before any `/build-next`. `/audit A4`, with a current `/audit A1`, before anything is called FROZEN (OPS-5, once ruled).
+
+**Pending proposals these commands serve.** `OPS-5` (decision durability) sits in `PROPOSED/`; rule it with `/rule OPS-5 …` after `/critique OPS-5` if you want a cold read, then `/build-next OPS-5` applies its one CLAUDE.md line. `GTM-3` (First Cache) also sits there: `/critique GTM-3`, then rule it, or `/design GTM-3` to redesign it from the problem up.
+
 ## Ground zero (start of every session)
 
 1. `pwd`. Check: it ends in `code/arena`.
@@ -137,3 +153,13 @@ Check: the new SESSION_LOG line names the pull request.
 **Constraints.** PR-1 to PR-6 stand unless you name one to supersede and say why (OPS-2: superseded, never edited). Number new contract rules PR-7, PR-8 and onward, so the F1 series continues, and list CLAUDE.md's OPS-1 line ("PR-1 to PR-6") under Downstream.
 
 **Out of scope.** The runtime (R1), the score validator (R2) and the factory stages (G1–G7). Design the contract they'll consume; don't design them.
+
+### WORLD-NAME — the lore world's name
+
+**Question.** Which of Freehold, Arclight, Quarterlight and Elsewhere becomes the world name in the ruled structure "[world name]: Arena" (BRAND-1), so that BRAND-1's blank is filled and the trademark search can start?
+
+**Start from** `governance/10-CANON/DECISIONS/BRAND-1-name-structure.md`, `BRAND-2-look-neon-noir.md` and `BRAND-3-core-line.md`. If a conflict sweep exists in `_audit/` (a file whose name contains `world_name`), its findings come first and are not re-derived; if none exists, say so and score conflict risk from a web search of each name alone and as "<name> Arena".
+
+**Settle, with options and undo costs:** conflict risk (games, studios, esports brands, live sites, marks the search surfaces); fit with the structure and the neon-noir look; ownability (distinct, spellable, searchable); lore headroom. L1, the lore bible, is the founder's and not yet frozen: don't invent lore; only check that a name doesn't foreclose it. Undo cost is REVERSIBLE today, EXPENSIVE once a mark is filed, LOCKED once marketed — say so in the Note.
+
+**Out of scope.** The tagline (BRAND-3), the look (BRAND-2), and anything in L1.
