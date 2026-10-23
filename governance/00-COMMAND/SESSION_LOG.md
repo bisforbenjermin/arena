@@ -2,6 +2,7 @@
 One entry per work session. Add at CLOSE. Format: `YYMMDD | [venture] | what moved | outcome`
 
 ---
+261022 | ARENA | G1 built: generation service (service.ts, budget.ts, queue.ts, brief-schema.ts, prompt/system.md+inject.ts, components/prng+canvas); typecheck clean; pushed f88d036 | G2 unblocked; factory/queue/pending/ ready to receive candidates
 261020 | ARENA | capsule regenerated to 261020-5; fixed three drift items: specs count (26 files), C4-ADDENDUM-1 location, G1 description | no rulings; G1 build ready to start
 261020 | ARENA | Claude Code GitHub App installed; gh api /user/installations 403 explained; "Danger zone" label explained | no files changed, no rulings
 261020 | ARENA | gitignore .DS_Store + tsbuildinfo; typecheck fixed (CookieOptions annotation, worker excluded from tsconfig); determinism gate 2/2 PASS | HEAD 94813da on origin/main; app/package-lock.json still untracked
