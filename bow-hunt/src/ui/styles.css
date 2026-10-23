@@ -1,0 +1,67 @@
+:root {
+  --bg: #2b1d12;
+  --panel: #3b2a1a;
+  --ink: #f6ead7;
+  --muted: #cdb89a;
+  --accent: #e07a3f;
+  --accent-ink: #1e140b;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+
+.app, .contest, .admin {
+  max-width: 992px;
+  margin: 0 auto;
+  padding: 16px;
+  position: relative;
+}
+
+h1 { font-size: 1.6rem; margin: 4px 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 1.25rem; margin: 0 0 8px; }
+.hint, .muted { color: var(--muted); font-size: 0.9rem; margin: 0 0 12px; }
+
+.game { display: flex; flex-direction: column; gap: 8px; }
+.game-canvas { display: block; border-radius: 12px; background: #f7d08a; }
+
+.hud {
+  display: flex; flex-wrap: wrap; gap: 8px 16px;
+  font-variant-numeric: tabular-nums; font-weight: 600;
+}
+.hud span { background: var(--panel); padding: 4px 10px; border-radius: 999px; }
+
+.overlay {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -30%);
+  background: var(--panel); border: 1px solid #5a4330; border-radius: 16px;
+  padding: 20px 24px; text-align: center; min-width: 260px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+.row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+button {
+  font: inherit; font-weight: 600; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+  border: 0; border-radius: 10px; padding: 8px 14px;
+}
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.secondary { background: transparent; color: var(--ink); border: 1px solid #5a4330; }
+
+input, select {
+  font: inherit; color: var(--ink); background: #241810;
+  border: 1px solid #5a4330; border-radius: 8px; padding: 6px 10px;
+}
+label { display: inline-flex; gap: 6px; align-items: center; }
+a { color: #f2c14e; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.card { background: var(--panel); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.card ul { margin: 0; padding-left: 18px; }
+
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #4a3725; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.panel { background: var(--panel); border-radius: 14px; padding: 14px 16px; }
+footer { color: var(--muted); font-size: 0.8rem; margin-top: 24px; }

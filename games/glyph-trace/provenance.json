@@ -1,0 +1,11 @@
+{
+  "gameId": "glyph-trace",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "human",
+  "parentLineage": null,
+  "authoredAt": "2026-10-23",
+  "license": "proprietary",
+  "ipClearance": "Original work. Trace-the-path mechanics are genre-standard and not protectable; glyphs are generated, not copied.",
+  "notes": "Drag control, ramp difficulty (glyphs grow from 3–4 nodes to up to 7). Exercises: trace_start/trace_move/trace_end with integer coordinates, integer point-to-segment distance, misses that score 0 without ending the round."
+}
