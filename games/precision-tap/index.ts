@@ -143,6 +143,16 @@ export class PrecisionTapSim implements GameSim {
 const W = 400;
 const H = 600;
 const R = 38; // target hit-circle radius px
+const FLASH_TICKS = 18; // ~300ms at 60Hz
+
+type Flash = { x: number; y: number; hit: boolean; p: number; startTick: number };
+
+function timingColor(p: number, alpha: number): string {
+  // 0-0.33 green (early/good), 0.33-0.66 yellow (mid), 0.66+ orange (late)
+  if (p < 0.33) return `rgba(80, 255, 150, ${alpha})`;
+  if (p < 0.66) return `rgba(255, 240, 80, ${alpha})`;
+  return `rgba(255, 180, 60, ${alpha})`;
+}
 
 export class PrecisionTapView implements GameView {
   private canvas:   HTMLCanvasElement | null = null;
@@ -150,6 +160,8 @@ export class PrecisionTapView implements GameView {
   private sim_:     PrecisionTapSim | null = null;
   private scoreCb_: ((rawScore: number, events: readonly GameEvent[]) => void) | null = null;
   private fired_  = false;
+  private flash_:  Flash | null = null;
+  private streak_ = 0;
 
   mount(container: HTMLElement, sim: Readonly<GameSim>): void {
     // Safe: PrecisionTapView is always paired with PrecisionTapSim by this module.
@@ -163,7 +175,24 @@ export class PrecisionTapView implements GameView {
     this.canvas = canvas;
     this.ctx    = canvas.getContext('2d')!;
 
-    const onInput = (): void => { this.sim_?.registerTap(); };
+    const onInput = (): void => {
+      const sim = this.sim_;
+      if (!sim) return;
+      const target = sim.getActiveTarget();
+      const p      = target ? sim.getTargetProgress() : 0;
+      sim.registerTap();
+      const events = sim.getEventLog();
+      const last   = events[events.length - 1];
+      if (!last || last.type !== 'tap') return;
+      const hit = (last.payload as { hit: boolean }).hit;
+      this.flash_ = {
+        x: target ? target.x * W : W / 2,
+        y: target ? target.y * H : H / 2,
+        hit, p,
+        startTick: sim.getCurrentTick(),
+      };
+      this.streak_ = hit ? this.streak_ + 1 : 0;
+    };
     canvas.addEventListener('click',      onInput);
     canvas.addEventListener('touchstart', onInput, { passive: true });
   }
@@ -197,11 +226,30 @@ export class PrecisionTapView implements GameView {
       ctx.lineWidth   = 2;
       ctx.stroke();
 
-      // Inner hit dot
+      // Inner hit dot — color-coded by timing window
       ctx.beginPath();
       ctx.arc(px, py, R * 0.32, 0, Math.PI * 2);
-      ctx.fillStyle = '#00ffcc';
+      ctx.fillStyle = timingColor(p, 1);
       ctx.fill();
+    }
+
+    // Flash on tap — green/yellow/orange on hit (by timing), red on miss
+    if (this.flash_) {
+      const age = sim.getCurrentTick() - this.flash_.startTick;
+      if (age < FLASH_TICKS) {
+        const alpha  = 1 - age / FLASH_TICKS;
+        const radius = R * (1 + age * 0.08);
+        const color  = this.flash_.hit
+          ? timingColor(this.flash_.p, alpha)
+          : `rgba(255, 60, 60, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(this.flash_.x, this.flash_.y, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = 4;
+        ctx.stroke();
+      } else {
+        this.flash_ = null;
+      }
     }
 
     // Score — top centre
@@ -209,6 +257,14 @@ export class PrecisionTapView implements GameView {
     ctx.font       = 'bold 26px monospace';
     ctx.textAlign  = 'center';
     ctx.fillText(`${Math.round(sim.getScore())}%`, W / 2, 38);
+
+    // Streak — top right
+    if (this.streak_ > 1) {
+      ctx.fillStyle = '#ffd166';
+      ctx.font      = 'bold 20px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`×${this.streak_}`, W - 12, 32);
+    }
 
     // Tick progress bar — bottom
     const progress = sim.getCurrentTick() / TOTAL_TICKS;
@@ -229,6 +285,8 @@ export class PrecisionTapView implements GameView {
     this.sim_    = null;
     this.scoreCb_= null;
     this.fired_  = false;
+    this.flash_  = null;
+    this.streak_ = 0;
   }
 }
 
