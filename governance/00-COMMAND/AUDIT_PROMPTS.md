@@ -170,6 +170,48 @@ nothing else. Do not audit anything. Do not suggest improvements.
 
 ---
 
+## S2 — Ruling header conformance
+`/model sonnet` · `/effort low` · or `/audit S2`
+
+Mechanical. Report; fix nothing. Header fields are the founder's words, and Code never rules. Under OPS-5 rule 3 a ruling must declare its weight, so this is the check that it did.
+
+```
+For every *.md in governance/10-CANON/DECISIONS/ except INDEX.md, check:
+1. Line 1 matches `# <ID> — <title>`.
+2. Line 2 contains all of: `Ruled:`, `Reversibility:` with exactly one of REVERSIBLE | EXPENSIVE |
+   LOCKED, `Undo cost:`, `Confidence:` with exactly one of HIGH | MEDIUM | LOW, and `Ratified by founder`.
+3. Sections present, in this order: ## Ruling, ## Why, ## Downstream.
+4. ## Downstream has at least one non-empty line before the next heading or EOF.
+5. Markers anywhere in the file: "Draft", "until confirmed", "TRUNCATED", "TODO", "TBD".
+6. The id in line 1 matches the filename prefix.
+
+Write the report as one flat table, one row per file, one column per check, PASS or the offending
+text. End with: files passing all six, files needing the founder (list), and nothing else.
+```
+
+---
+
+## S3 — Spec debt table
+`/model sonnet` · `/effort medium` · or `/audit S3`
+
+Mechanical. The spec debt ceiling ("no new spec while an existing spec has no running artifact") checked by `ls` instead of memory.
+
+```
+1. Sources: every specs/<ID>.md and every July spec specs/<ID>_*.md (pair them by ID; the <ID>.md
+   is the reconciled one and wins where both exist).
+2. For each spec, read its ## Output Contract paths and check each on disk.
+3. Classify: BUILT (every output path exists and is non-empty) | PARTIAL (some exist, or a DEFERRED
+   table names the rest) | NONE (no output path exists). Evidence = the paths found. Also report the
+   spec's Status line if it has one (AWAITING FOUNDER / APPROVED), and any DEFERRED markers in the
+   artifact's README.
+4. Rows sorted by chain then number (F, R, G, L, C).
+
+Write one flat table. End with one line: count of specs with status NONE — that number is the current
+spec debt. No commentary, no recommendation of what to build next.
+```
+
+---
+
 ## Escalation rule
 
 Do not start at A2. If you catch yourself opening a session at max effort on an unreduced
@@ -186,3 +228,4 @@ A2 once per phase, never more.
 A3 when stuck or bored — it's the one that's actually fun.
 A4 before any freeze.
 A5 weekly.
+S2 after any ruling lands. S3 before any new spec is written, and before any `/build-next`.

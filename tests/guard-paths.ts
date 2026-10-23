@@ -59,6 +59,21 @@ test('agents: an allowlist narrows writes, and the protected list still wins', (
   assert.equal(run(`${ROOT}/specs/G1_generation_agent_brief.md`, ['specs/']), BLOCK);
 });
 
+test('auditor agents: _audit/ only, and never the canon they audit', () => {
+  const audit = ['_audit/'];
+  assert.equal(run(`${ROOT}/_audit/A0_mechanical_sweep_2026-10-23.md`, audit), ALLOW);
+  assert.equal(run('_audit/S2_ruling_header_conformance_2026-10-23.md', audit), ALLOW);
+  for (const p of [
+    `${ROOT}/governance/10-CANON/DECISIONS/INDEX.md`,
+    `${ROOT}/governance/00-COMMAND/AUDIT_PROMPTS.md`,
+    `${ROOT}/contracts/game-module.ts`,
+    `${ROOT}/specs/G1.md`,
+    `${ROOT}/CLAUDE.md`,
+  ]) {
+    assert.equal(run(p, audit), BLOCK, p);
+  }
+});
+
 test('design sessions: proposals, rulings, the archive and scratch files only', () => {
   const design = ['--design'];
   for (const p of [
