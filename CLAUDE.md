@@ -63,6 +63,18 @@ Blocked until ruled:
 - Never answer "does my code satisfy ruling X?" with an opinion. Write or run a test.
 - After any change to `contracts/` or `games/`, run `tests/determinism.ts` (the PR-1/2/3 gate) and paste the runner's output verbatim.
 - A failing test is an artifact. Commit it.
+- `npm test` runs every test in `tests/`, and CI (`.github/workflows/ci.yml`) runs it on every push and pull request.
+
+## Build crew (`.claude/agents/`, `.claude/skills/`)
+Every hard call runs one loop: design, cold critique, the founder rules, build. Steps, checks and design briefs: `governance/00-COMMAND/BUILD_RUNBOOK.md`.
+- `/design <ID>`: Fable at max effort, one hard call per fresh session. Writes a proposal to `PROPOSED/`, has the cold critic attack it, revises once at most. Never rules.
+- `/critique <ID>`: the cold critic alone, on a proposal or a HANDOFF.
+- `/rule <ID> <his words>`: founder only; Claude can't invoke it. Writes the DECISIONS file in house format and archives the drafts.
+- `/build-next <ID>`: Opus. Reconciles a spec (or takes a ruling with Build steps), stops for the founder, builds, verifies, opens a PR. Never merges.
+
+Agents: **spec-reconciler** (Opus) turns a July spec into `specs/<ID>.md` with its conflicts and handoffs · **builder** (Opus) builds an APPROVED spec or a ruling's Build steps on `build/<ID>`, tests first · **verifier** (Sonnet, a different model from the builder) tests against the Done criteria and never fixes code · **cold-critic** (Opus, a different model from the designer) attacks proposals before the founder rules.
+
+A guard, `.claude/hooks/guard-paths.mjs`, blocks every agent from writing `contracts/`, `governance/` and the July specs. In a `/design` session it allows only `PROPOSED/`, `DECISIONS/` and the archive. `contracts/` changes only in a build session, copied from a ruling's text. `tests/guard-paths.ts` pins this behaviour.
 
 ## Directions to the founder (operator runway, protocol v1.4)
 - Name ground zero. Give one action per step, each with an observable check (`pwd` → `…/code/arena`).
