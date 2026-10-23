@@ -1,5 +1,5 @@
 # BUILD RUNBOOK — from build crew to game factory
-Updated: 2026-10-22 | For: the founder, and `/design`, which reads the briefs at the end
+Updated: 2026-10-22 (Sonnet lane merged in) | For: the founder, `/design` (reads the briefs at the end) and `/sonnet-run` (reads *Which lane* and *The Sonnet lane*)
 
 Each step is one action and one check. If a check fails, stop; don't troubleshoot in place. Anything long goes in a file, never a paste.
 
@@ -22,6 +22,54 @@ Every hard call goes round the same loop, and nothing is built until it has been
 
 **Switching models.** `/design` and `/build-next` set their own model and effort for the turn you run them in. Set the session to match first, so your follow-up questions stay on the same model: `/model fable` then `/effort max` for design, `/model opus` then `/effort high` for builds. From a terminal, `claude --model fable --effort max` (or `--model opus --effort high`) opens a fresh session already set.
 
+## Which lane: Sonnet, Opus or Fable
+
+Sonnet does the mechanical work and stops at the first call that needs judgment. Opus and Fable see only those calls, each as one stop block. Run this test on every task before starting it, and again whenever a step surprises you.
+
+If you're unsure between two tiers, take the higher one. Sonnet counts options; it never picks between them.
+
+### SONNET: mechanical (build it)
+All three must hold:
+1. **The source is settled.** An APPROVED `specs/<ID>.md`, a ratified ruling with `### Build steps` and `### Done criteria`, or a task with no design content (tests, CI, type checks, docs that describe existing code, `provenance.json`, ledger open and close).
+2. **It touches nothing on OPS-1's stop list** (CLAUDE.md): not `contracts/`, not PR-1 to PR-6 or any later contract rule, not a gate, prize economics or credits.
+3. **A revert undoes it** in under an hour, and nothing else will be built on top of a choice it makes.
+
+Examples: a ruling's build steps; tests encoding an existing ruling's Done criteria; CI and type-check fixes; retrofitting games or factory code to a contract version that's already ruled; READMEs; drift reports.
+
+### OPUS: rule now (route `OPUS-RULE` or `OPUS-BUILD`)
+Any of:
+- Reconciling a July spec into `specs/<ID>.md`. Its conflicts need judgment, so the reconciler runs on Opus. → `OPUS-BUILD`: `/build-next <ID>`.
+- A choice between options where a revert is cheap: a model name, a budget, a threshold, a weight. → `OPUS-RULE`: `/critique <ID>` if unsure, then `/rule`.
+- The same failure after two attempts, a VERIFY FAIL after one fix round, or a test that contradicts a ruling. → `OPUS-RULE`.
+
+### FABLE: design (route `FABLE-DESIGN`)
+Either of:
+- **All three** of the runbook's tests: EXPENSIVE or LOCKED to undo; two or more defensible options; it shapes more than one spec.
+- **Canon or strategy, whatever its size**: `contracts/` (F1, the game contract), gates (Arena Coin counsel clearance, crowdfunding), prize economics (CP-0, GTM-2), credits (CREDIT-1), GTM, BRAND and the world name, lore canon (L1), anything in `governance/40-LEGAL/` or `governance/50-STRATEGY/`, the board (OPS-4), and security boundaries (what contains machine-written code).
+
+Carry it to a fresh Claude Code session (`/model fable`, `/effort max`, `/design <ID>`), or to a max-effort chat in the ARENA Project. If Fable isn't available, use Opus at max; the runbook says how.
+
+### Never written by Sonnet
+`contracts/`, `governance/10-CANON/`, `governance/40-LEGAL/`, `governance/50-STRATEGY/`, `governance/00-COMMAND/PROPOSED/`, `lore/`, and the July specs (`specs/<letter><n>_*.md`, `specs/00_*.md`). If a task needs one of them, that is the escalation.
+
+### The stop block
+
+CLAUDE.md's HANDOFF block plus four lines, so the founder knows where to carry it and how to come back.
+
+```
+HANDOFF — <ID>: <topic>
+Route: SONNET-NEVER | OPUS-RULE | OPUS-BUILD | FABLE-DESIGN
+Why this route: <the test it failed, in one line>
+Question:
+Options, with the undo cost of each:
+Recommendation (PROPOSED): <for FABLE-DESIGN write "None: left to design", so the designer starts unanchored>
+Blocked until ruled: <what waits, and what can go on without it>
+Carry to: <exact command, or "ARENA Project chat, max effort">
+Resume with: /sonnet-run   (chat: prompt B3)
+```
+
+Use the next free ID: `<spec>-H<n>` for a hand-off inside a spec, otherwise a short name such as `G2-CONTAIN`.
+
 ## Routine commands (Sonnet tier, except where the audit tier says otherwise)
 
 The loop above is for hard calls. These five are for everything that isn't: the ledger rituals and the mechanical checks that keep the canon legible. None of them rules; none of them touches `contracts/`.
@@ -33,10 +81,26 @@ The loop above is for hard calls. These five are for everything that isn't: the 
 | `/index` | Regenerates `governance/10-CANON/DECISIONS/INDEX.md`: every ruling, proposal and superseded file as a pointer table. Run it after any ruling lands. | Sonnet, low |
 | `/land` | Lands files you dropped into `_incoming/` where a `MANIFEST.md` says, stamps proposals PROPOSED, commits once. Refuses rulings (`/rule`) and contracts (`/build-next`). | Sonnet, low |
 | `/audit <tier>` | Runs one tier of `AUDIT_PROMPTS.md` (A0–A5, S2 ruling headers, S3 spec debt) through the auditor agent whose model matches the tier, saves the report to `_audit/`, commits it. Refuses A1 without A0 and A2 without A1. | by tier: Sonnet / Opus / Fable |
+| `/sonnet-run [ID]` | Builds the capsule's mechanical queue as pull requests and stops everything else with a routed stop block. See *The Sonnet lane*. | Sonnet, high |
 
 **Ordering.** `/open` first; `/close` last. `/index` and `/audit S2` after every `/rule`. `/audit S3` before any `/build-next`. `/audit A4`, with a current `/audit A1`, before anything is called FROZEN (OPS-5, once ruled).
 
 **Pending proposals these commands serve.** `OPS-5` (decision durability) sits in `PROPOSED/`; rule it with `/rule OPS-5 …` after `/critique OPS-5` if you want a cold read, then `/build-next OPS-5` applies its one CLAUDE.md line. `GTM-3` (First Cache) also sits there: `/critique GTM-3`, then rule it, or `/design GTM-3` to redesign it from the problem up.
+
+## The Sonnet lane (`/sonnet-run`)
+
+State lives in the ledger (capsule, log, DECISIONS/), never in this section, so it stays correct as work moves. `/sonnet-run` takes its queue from the capsule's NEXT ACTION and SONNET QUEUE.
+
+1. **Boot.** The open ritual (`/open`): sync, read the ledger, check drift, three lines.
+2. **Queue.** The capsule's NEXT ACTION, then its SONNET QUEUE, in order. Route each one (*Which lane*).
+3. **Escalations first, as blocks.** Write a stop block for each item that routes up, and keep going: one blocked item doesn't stop independent ones.
+4. **Build each mechanical item** on its own branch `sonnet/<slug>`: tests first, then the change, then `npm test` and any type check that covers the files. Before pushing, check the diff for protected paths (*Which lane*). Then the **verifier** subagent judges the branch against the source, never against Sonnet's own account.
+5. **Push and open a pull request.** Never merge. At most three pull requests per run, so review stays possible.
+6. **Report**: a table of items with DONE (PR link), HANDOFF (route), BLOCKED (on what) or SKIPPED (why). Then the stop blocks in full, then a SESSION_LOG line, committed to the last branch. `/close` stays yours.
+
+**Limits.** Two attempts per failure, then escalate. One verify-fix round, then escalate. No new dependency without an MIT, Apache-2.0 or CC0 licence. No secrets in files. Code that calls a model needs a budget cap and logs tokens and cost per call.
+
+**Independence trade-off.** On this path Sonnet builds and the verifier is Sonnet too, so they share a model. Tests written from the source and CI are the independent check. For anything in the Opus or Fable lanes, use `/build-next`, which keeps the builder and verifier on different models.
 
 ## Ground zero (start of every session)
 
@@ -121,6 +185,60 @@ Check: the new SESSION_LOG line names the pull request.
 **G4 — quality scoring** (objective metrics plus a model judge)
 - Whether the judge may archive a game without your taste check (PD-8), and which model judges (not the one that generated it). Rule now, perhaps after `/critique`: weights and thresholds are cheap to re-run.
 - Start the judge from prompt P6 in `docs/employability/EMPLOYABILITY_REVIEW.md`.
+
+## Sonnet prompts (Claude Code on the web, Project chat)
+
+### A. Claude Code on the web (Sonnet, repo connected) — the main path
+
+Open a session on `bisforbenjermin/arena`, set the model to Sonnet, and type:
+
+```
+/sonnet-run
+```
+
+To aim it at one item: `/sonnet-run <ID or capsule queue line>`. The skill (`.claude/skills/sonnet-run/SKILL.md`) runs *The Sonnet lane*.
+
+If skills don't load in your session, paste this instead:
+
+```
+Read CLAUDE.md, then the sections "Which lane" and "The Sonnet lane" of governance/00-COMMAND/BUILD_RUNBOOK.md, then follow .claude/skills/sonnet-run/SKILL.md as if I had typed /sonnet-run. Build only what "Which lane" calls mechanical. Stop each item at its first escalation with the stop block, then go on to the next independent item. Never merge. End with the run report.
+```
+
+### B. ARENA Project chat (Sonnet, no shell)
+
+The Project mirrors GitHub `main`, so merge open pull requests first or the chat won't see them.
+
+B1, to start (paste once per chat):
+
+```
+You are the mechanical builder for ARENA. Read, in this order, from the Project files: CLAUDE.md; governance/00-COMMAND/BUILD_RUNBOOK.md (sections "Which lane", "The Sonnet lane"); governance/00-COMMAND/CONTEXT_CAPSULE.md; the top 5 lines of governance/00-COMMAND/SESSION_LOG.md; the file list of governance/10-CANON/DECISIONS/.
+
+Then reply in four lines, nothing else:
+1. Where things stand.
+2. The NEXT ACTION and its route (SONNET, OPUS-RULE, OPUS-BUILD or FABLE-DESIGN), using "Which lane".
+3. The capsule's SONNET QUEUE items you can do in this chat, by number.
+4. Drift between the capsule, the log and the decision files, or "none".
+
+Rules for this chat. You have no shell, so you can't run tests or commit:
+- Deliver every changed file whole, as a downloadable file, never as a paste in the reply. Name its repo path.
+- Mark every deliverable UNVERIFIED and give the exact command that verifies it (usually `npm test`).
+- A DECISIONS file beats the capsule, memory or this chat. Say so when they disagree.
+- You never rule. At the first call "Which lane" doesn't make mechanical, stop that item with the stop block.
+```
+
+B2, to work (repeat as needed):
+
+```
+Do queue item <n>. Follow "The Sonnet lane" as far as a chat can: read the source, list the files you'll change, write tests first, then the change. Stop at the first escalation with a stop block. End with the files, the verify command, and a one-line SESSION_LOG entry.
+```
+
+B3, to resume after Opus or Fable has ruled:
+
+```
+The founder has ruled on <ID>. The ruling is governance/10-CANON/DECISIONS/<file> (merged to main). Re-read it, then the capsule. Say in one line what the ruling unblocks, re-run the routing test on each unblocked item, and continue with the first mechanical one.
+```
+
+Carrying the work back: download the files, then in a Claude Code session type `apply the files I upload to a branch sonnet/<slug>, run npm test, and open a pull request`. Or commit them yourself and push a branch. CI is the referee either way.
 
 ## When something goes wrong
 

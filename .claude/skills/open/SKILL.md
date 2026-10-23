@@ -8,7 +8,7 @@ effort: low
 
 Open the arena ledger. The ritual is the `## open the arena ledger` section of `CLAUDE.md`; follow it exactly. This command only adds the mechanics.
 
-1. `pwd` must end in `code/arena`. If not, stop.
+1. `pwd` must end in `code/arena`, or, in a cloud session, `git remote get-url origin` must name `bisforbenjermin/arena`. If not, stop.
 2. `git switch main` (or stay if already there), then `git pull --rebase`. If the pull fails, show the output and stop.
 3. Read `governance/00-COMMAND/CONTEXT_CAPSULE.md`, the top 5 lines under the `---` of `governance/00-COMMAND/SESSION_LOG.md`, `ls governance/10-CANON/DECISIONS/`, `ls governance/00-COMMAND/PROPOSED/`, and `git log --oneline -5`.
 4. Drift check. Drift is any of: the capsule's `Updated:` stamp is older than the newest log line; a ruling file exists that the capsule's rulings list doesn't name; the capsule's NEXT ACTION names work the log says is done; a PROPOSED file exists that the capsule's open items don't mention.

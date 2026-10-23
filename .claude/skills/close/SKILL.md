@@ -11,7 +11,7 @@ Close the arena ledger. The ritual is the `## close the arena ledger` section of
 
 Input: $ARGUMENTS — `what moved | outcome`, if given.
 
-1. `pwd` must end in `code/arena`. If not, stop.
+1. `pwd` must end in `code/arena`, or, in a cloud session, `git remote get-url origin` must name `bisforbenjermin/arena`. If not, stop.
 2. If `$ARGUMENTS` is empty, derive one line from this session's work: what moved (files, PRs, rulings) and the outcome (where it stopped, or what was confusing). If this session did nothing ledger-worthy, say "no delta — nothing to close" and stop. Don't write a line for pure Q&A.
 3. Add one line directly under the `---` in `governance/00-COMMAND/SESSION_LOG.md`: `<YYMMDD> | ARENA | <what moved> | <outcome>`. Newest first; change nothing else in the file.
 4. If anything was ruled this session, its file in `governance/10-CANON/DECISIONS/` must already exist. If it doesn't, stop and say `Run /rule <ID> <your ruling> | Confidence: … first, then /close again.` Never write a ruling from the close.

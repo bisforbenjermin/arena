@@ -71,7 +71,7 @@ Every hard call runs one loop: design, cold critique, the founder rules, build. 
 - `/critique <ID>`: the cold critic alone, on a proposal or a HANDOFF.
 - `/rule <ID> <his words>`: founder only; Claude can't invoke it. Writes the DECISIONS file in house format and archives the drafts.
 - `/build-next <ID>`: Opus. Reconciles a spec (or takes a ruling with Build steps), stops for the founder, builds, verifies, opens a PR. Never merges.
-- `/sonnet-run`: Sonnet. Builds only mechanical work (settled source, nothing on the OPS-1 list, cheap to revert) as pull requests, and stops everything else with a routed HANDOFF. Routing test, stop block and chat prompts: `governance/00-COMMAND/SONNET_LOOP.md`.
+- `/sonnet-run`: Sonnet. Builds only mechanical work (settled source, nothing on the OPS-1 list, cheap to revert) as pull requests, and stops everything else with a routed HANDOFF. Routing test (*Which lane*), stop block and chat prompts: `governance/00-COMMAND/BUILD_RUNBOOK.md`.
 
 Routine commands, Sonnet unless the audit tier says otherwise: `/open` and `/close` run the two ledger rituals above · `/index` regenerates `governance/10-CANON/DECISIONS/INDEX.md` · `/land` lands files from `_incoming/` per its `MANIFEST.md`, never rulings or contracts · `/audit <tier>` runs one tier of `governance/00-COMMAND/AUDIT_PROMPTS.md` through an auditor agent (Sonnet for A0/A5/S2/S3, Opus for A1, Fable for A2–A4) and commits the report to `_audit/`.
 

@@ -9,7 +9,7 @@ effort: high
 
 Run the Sonnet loop. Target: $ARGUMENTS (empty means the whole queue).
 
-The routing test, the stop block and the limits live in `governance/00-COMMAND/SONNET_LOOP.md`. Read it now, sections 1, 2 and 4. If this file and that one disagree, that one wins; say so in the report.
+The routing test, the stop block and the limits live in `governance/00-COMMAND/BUILD_RUNBOOK.md`, sections *Which lane* and *The Sonnet lane*. Read both now. If this file and the runbook disagree, the runbook wins; say so in the report.
 
 You never rule. You count options; you never pick between them.
 
@@ -29,11 +29,11 @@ Reply in three lines: where things stand · the NEXT ACTION · drift (or "none")
 
 List the queue: the capsule's NEXT ACTION first, then its SONNET QUEUE, in order. If $ARGUMENTS names one item, the queue is that item.
 
-For each item, read its source (the ruling, spec or file it names) and apply SONNET_LOOP.md section 1. Show one table:
+For each item, read its source (the ruling, spec or file it names) and apply *Which lane*. Show one table:
 
 | # | Item | Route | Why (the test it passed or failed) | Depends on |
 
-Before building anything, write a stop block (section 2) for every item that routes up. One blocked item doesn't stop items that don't depend on it.
+Before building anything, write a stop block (*The stop block*) for every item that routes up. One blocked item doesn't stop items that don't depend on it.
 
 **FOUNDER:** if any route is a judgment call, ask once (AskUserQuestion, one question per doubtful item) whether to build it or escalate it. With no answer, escalate.
 

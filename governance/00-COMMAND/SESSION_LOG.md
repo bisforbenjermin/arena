@@ -2,6 +2,7 @@
 One entry per work session. Add at CLOSE. Format: `YYMMDD | [venture] | what moved | outcome`
 
 ---
+261022 | ARENA | PR #2 reviewed (auditor-mechanical frontmatter fixed: unquoted colon), merged into ops/sonnet-loop with main; SONNET_LOOP.md folded into BUILD_RUNBOOK (Which lane, Sonnet lane, prompts); cloud repo check in all skills; capsule 261022-2 | one PR to merge: ops/sonnet-loop (carries #2); then /design CONTRACT-2
 261022 | ARENA | Sonnet loop: /sonnet-run skill + SONNET_LOOP.md (routing test, routed HANDOFF, chat prompts); cloud-session repo check in CLAUDE.md and /build-next; capsule regenerated to 261022-1 | PR ops/sonnet-loop (carries PR #1); no rulings; escalations open: CONTRACT-2, G2-CONTAIN, G1-PD8, G1-MODEL
 261022 | ARENA | G2 built: sandbox runner + 5 gates (forbidden-apis, compile, bundle-size, determinism, memory-leak); jsdom instead of Playwright (mac12 incompatible); typecheck clean; pushed 18f3853 | G3 unblocked; pipeline end-to-end wired G1→G2
 261022 | ARENA | G1 built: generation service (service.ts, budget.ts, queue.ts, brief-schema.ts, prompt/system.md+inject.ts, components/prng+canvas); typecheck clean; pushed f88d036 | G2 unblocked; factory/queue/pending/ ready to receive candidates

@@ -21,7 +21,7 @@ The founder's runway, before this runs: put the files and a `MANIFEST.md` into `
 
 ## 0. Checks
 
-1. `pwd` ends in `code/arena`. `git switch main`, `git pull --rebase`, then `git status --porcelain` prints only lines beginning `?? _incoming/`. Anything else: stop and list it.
+1. `pwd` ends in `code/arena`, or, in a cloud session, `git remote get-url origin` names `bisforbenjermin/arena`. `git switch main`, `git pull --rebase`, then `git status --porcelain` prints only lines beginning `?? _incoming/`. Anything else: stop and list it.
 2. `_incoming/MANIFEST.md` exists and every `file` it names exists in `_incoming/`. Every file in `_incoming/` other than the manifest is named in it. Otherwise stop and list the difference.
 3. Every destination is allowed. Allowed: `governance/00-COMMAND/` and its subfolders, `_audit/`, `docs/`, `specs/` (new `<ID>.md` names only — never a July `<ID>_*.md` or `00_*.md`, OPS-2). Refused, with the command that owns it: `governance/10-CANON/DECISIONS/` → `/rule`; `contracts/` → `/build-next`; `CLAUDE.md`, `.claude/`, `.github/` → a pull request. One refused row stops the whole landing.
 4. No destination path already exists. If one does, stop: landing never overwrites (OPS-2 — supersede, never edit in place).

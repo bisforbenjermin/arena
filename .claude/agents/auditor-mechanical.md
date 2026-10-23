@@ -1,6 +1,6 @@
 ---
 name: auditor-mechanical
-description: Runs one audit tier from governance/00-COMMAND/AUDIT_PROMPTS.md and writes its report to _audit/. Tiers A0, A5, S2 and S3 — the enumerating tiers. Pure enumeration: no judgment, no recommendations, no fixes. Use only through /audit. Never fixes anything.
+description: "Runs one audit tier from governance/00-COMMAND/AUDIT_PROMPTS.md and writes its report to _audit/. Tiers A0, A5, S2 and S3 — the enumerating tiers. Pure enumeration: no judgment, no recommendations, no fixes. Use only through /audit. Never fixes anything."
 tools: Read, Grep, Glob, Bash, Write
 model: sonnet
 effort: medium

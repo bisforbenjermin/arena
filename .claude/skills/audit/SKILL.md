@@ -16,7 +16,7 @@ Run audit tier $tier. You dispatch and commit; the agent audits. Cost follows co
 
 A3 is written for Fable at high; it runs at max here because an agent carries one effort setting. That's the only deviation from `AUDIT_PROMPTS.md`.
 
-1. `pwd` must end in `code/arena`. If not, stop. `git pull --rebase`.
+1. `pwd` must end in `code/arena`, or, in a cloud session, `git remote get-url origin` must name `bisforbenjermin/arena`. If not, stop. `git pull --rebase`.
 2. `$tier` must be one of the eight above; otherwise stop and show the table. If it's `A2` and no `_audit/A1_*` exists, or `A1` and no `_audit/A0_*` exists, stop: `Run /audit <earlier tier> first.` Never hand an unreduced problem to max effort.
 3. `mkdir -p _audit`. The output path is `_audit/<tier>_<slug>_<YYYY-MM-DD>.md`, where `<slug>` is the lowercased tier title from `AUDIT_PROMPTS.md` with spaces as underscores (`A0_mechanical_sweep_2026-10-23.md`). If that path exists, append `-2`, `-3`.
 4. Use the agent from the table. Pass exactly one line and nothing else: `Run $tier → <output path>.` Add no context, no hint of what you expect it to find.

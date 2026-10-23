@@ -22,7 +22,7 @@ From now on a guard limits this session's file writes, inside the repo, to `gove
 
 ## 0. Preflight
 
-1. `pwd` must end in `code/arena`. If not, stop.
+1. `pwd` must end in `code/arena`, or, in a cloud session, `git remote get-url origin` must name `bisforbenjermin/arena`. If not, stop.
 2. Run `git switch main`, then `git pull --rebase`, then `git status --porcelain`. The last must print nothing. If it prints anything, stop and show it.
 3. Note `git rev-parse --short HEAD`. The proposal cites it.
 
