@@ -3,7 +3,7 @@
 Claude Code reads this first in every session. ARENA's canon lives in this repo, so governance sits with the code it governs.
 
 ## Where you are
-- This repo is `~/code/arena`. If `pwd` shows anything else, stop: you're in the wrong repo.
+- This repo is `~/code/arena`. If `pwd` shows anything else, stop: you're in the wrong repo. In a cloud session (Claude Code on the web) the path differs; there the check is `git remote get-url origin`, which must name `bisforbenjermin/arena`.
 - Never build in `~/arena` (the July repo) or `~/HQ` (superseded on 2026-10-19). Both are history.
 
 ## The ledger
@@ -71,6 +71,7 @@ Every hard call runs one loop: design, cold critique, the founder rules, build. 
 - `/critique <ID>`: the cold critic alone, on a proposal or a HANDOFF.
 - `/rule <ID> <his words>`: founder only; Claude can't invoke it. Writes the DECISIONS file in house format and archives the drafts.
 - `/build-next <ID>`: Opus. Reconciles a spec (or takes a ruling with Build steps), stops for the founder, builds, verifies, opens a PR. Never merges.
+- `/sonnet-run`: Sonnet. Builds only mechanical work (settled source, nothing on the OPS-1 list, cheap to revert) as pull requests, and stops everything else with a routed HANDOFF. Routing test, stop block and chat prompts: `governance/00-COMMAND/SONNET_LOOP.md`.
 
 Agents: **spec-reconciler** (Opus) turns a July spec into `specs/<ID>.md` with its conflicts and handoffs · **builder** (Opus) builds an APPROVED spec or a ruling's Build steps on `build/<ID>`, tests first · **verifier** (Sonnet, a different model from the builder) tests against the Done criteria and never fixes code · **cold-critic** (Opus, a different model from the designer) attacks proposals before the founder rules.
 

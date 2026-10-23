@@ -12,7 +12,7 @@ Run $spec through the build crew. One build per run. Stop at every step marked *
 
 ## 0. Preflight (this session, no subagents)
 
-1. `pwd` must end in `code/arena`. If not, stop.
+1. `pwd` must end in `code/arena`, or, in a cloud session, `git remote get-url origin` must name `bisforbenjermin/arena`. If not, stop.
 2. Run `git switch main`, then `git pull --rebase`, then `git status --porcelain`. The last must print nothing. If it prints anything, stop and show it.
 3. Read `governance/00-COMMAND/CONTEXT_CAPSULE.md`. If $spec isn't the NEXT ACTION, say so in one line and ask whether to continue.
 4. Find the source. Stop if there's none.
