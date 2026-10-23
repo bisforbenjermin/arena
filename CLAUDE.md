@@ -72,7 +72,9 @@ Every hard call runs one loop: design, cold critique, the founder rules, build. 
 - `/rule <ID> <his words>`: founder only; Claude can't invoke it. Writes the DECISIONS file in house format and archives the drafts.
 - `/build-next <ID>`: Opus. Reconciles a spec (or takes a ruling with Build steps), stops for the founder, builds, verifies, opens a PR. Never merges.
 
-Agents: **spec-reconciler** (Opus) turns a July spec into `specs/<ID>.md` with its conflicts and handoffs · **builder** (Opus) builds an APPROVED spec or a ruling's Build steps on `build/<ID>`, tests first · **verifier** (Sonnet, a different model from the builder) tests against the Done criteria and never fixes code · **cold-critic** (Opus, a different model from the designer) attacks proposals before the founder rules.
+Routine commands, Sonnet unless the audit tier says otherwise: `/open` and `/close` run the two ledger rituals above · `/index` regenerates `governance/10-CANON/DECISIONS/INDEX.md` · `/land` lands files from `_incoming/` per its `MANIFEST.md`, never rulings or contracts · `/audit <tier>` runs one tier of `governance/00-COMMAND/AUDIT_PROMPTS.md` through an auditor agent (Sonnet for A0/A5/S2/S3, Opus for A1, Fable for A2–A4) and commits the report to `_audit/`.
+
+Agents: **auditor-mechanical** (Sonnet), **auditor-coherence** (Opus), **auditor-review** (Fable) run audit tiers and may write only `_audit/` · **spec-reconciler** (Opus) turns a July spec into `specs/<ID>.md` with its conflicts and handoffs · **builder** (Opus) builds an APPROVED spec or a ruling's Build steps on `build/<ID>`, tests first · **verifier** (Sonnet, a different model from the builder) tests against the Done criteria and never fixes code · **cold-critic** (Opus, a different model from the designer) attacks proposals before the founder rules.
 
 A guard, `.claude/hooks/guard-paths.mjs`, blocks every agent from writing `contracts/`, `governance/` and the July specs. In a `/design` session it allows only `PROPOSED/`, `DECISIONS/` and the archive. `contracts/` changes only in a build session, copied from a ruling's text. `tests/guard-paths.ts` pins this behaviour.
 
