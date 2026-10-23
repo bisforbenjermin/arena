@@ -1,0 +1,160 @@
+/* Layout: a marquee, then a two-column bank of arcade cabinets; playing opens one cabinet full width.
+   Neon-noir per BRAND-2, deliberately single (dark) theme. */
+:root {
+  --bg: #07080f;
+  --panel: #10121d;
+  --panel-edge: #1d2133;
+  --fg: #f0f0f0;
+  --muted: #a3a9c2;
+  --crimson: #e0103a;
+  --crimson-bright: #ff3355;
+  --cyan: #2de2e6;
+  --violet: #9b8cff;
+  --harvest: #f2a541;
+  --ok: #46e08a;
+  --bad: #ff6b7d;
+  --font-mark: 'Press Start 2P', ui-monospace, monospace;
+  --font-head: 'Chakra Petch', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.arcade {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.marquee { display: flex; flex-direction: column; gap: 10px; }
+.wordmark {
+  margin: 0;
+  font-family: var(--font-mark);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 6vw, 3rem);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  text-shadow: 0 0 18px rgba(224, 16, 58, 0.65), 3px 3px 0 var(--crimson);
+  text-wrap: balance;
+}
+.tagline { margin: 0; font-family: var(--font-head); font-size: 1.25rem; color: var(--cyan); }
+
+.intro { display: flex; flex-direction: column; gap: 14px; max-width: 68ch; }
+.intro p { margin: 0; }
+.seedbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.cabinets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 720px) { .cabinets { grid-template-columns: 1fr; } }
+
+.cabinet {
+  --cab: var(--cyan);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px 20px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cab) 9%, var(--panel)), var(--panel) 55%);
+  border: 1px solid var(--panel-edge);
+  border-top: 3px solid var(--cab);
+  border-radius: 6px;
+  min-width: 0;
+}
+.cabinet h2, .play h2 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1.15;
+  color: var(--cab);
+  text-wrap: balance;
+}
+.cabinet .pitch { margin: 0; }
+.cabinet .facts { margin: 0; color: var(--muted); }
+.cabinet button { align-self: flex-start; margin-top: 6px; }
+
+button {
+  font: inherit;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--fg);
+  background: var(--crimson);
+  border: 0;
+  border-radius: 4px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+button:hover { background: var(--crimson-bright); box-shadow: 0 0 16px rgba(255, 51, 85, 0.45); }
+button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+button.ghost { background: transparent; border: 1px solid var(--muted); color: var(--fg); }
+button.ghost:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: none; }
+
+.play { --cab: var(--cyan); display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 12px; }
+.playhead { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.seedtag { color: var(--muted); }
+.how { margin: 0; max-width: 68ch; }
+
+.stage {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px;
+  background: #000;
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cab) 30%, transparent), 0 0 32px color-mix(in srgb, var(--cab) 18%, transparent);
+  touch-action: none;
+}
+/* Fit each game to the screen: width follows the height left after the play header. */
+.stage.f1 canvas {
+  width: min(100%, calc((100dvh - 110px) * var(--ratio))) !important;
+  max-width: 100%;
+  height: auto !important;
+  margin: 0 auto;
+}
+
+/* Bow Hunt's own HUD and canvas, inside its cabinet */
+.stage.bow .game { display: flex; flex-direction: column; gap: 8px; }
+.stage.bow .hud { display: flex; flex-wrap: wrap; gap: 8px 12px; font-family: var(--font-head); font-weight: 700; font-variant-numeric: tabular-nums; }
+.stage.bow .hud span { background: var(--panel); border: 1px solid var(--panel-edge); padding: 2px 12px; border-radius: 4px; }
+.stage.bow .game-canvas { display: block; margin: 0 auto; border-radius: 6px; width: min(100%, calc((100dvh - 160px) * 16 / 9)) !important; }
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-left: 3px solid var(--cab);
+  border-radius: 6px;
+}
+.result p { margin: 0; }
+.final { font-family: var(--font-head); font-size: 1.5rem; }
+.final strong { color: var(--cab); }
+.verify { color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+
+.foot { color: var(--muted); max-width: 68ch; }
+.foot p { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
+}

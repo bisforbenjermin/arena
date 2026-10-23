@@ -1,0 +1,11 @@
+{
+  "gameId": "stack-shift",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "human",
+  "parentLineage": null,
+  "authoredAt": "2026-10-23",
+  "license": "proprietary",
+  "ipClearance": "Original implementation and visuals. Placing polyominoes on a grid and clearing full rows and columns is a genre-standard puzzle mechanic and not protectable; no names, art or layouts are taken from existing titles.",
+  "notes": "Drag control, flat difficulty. Exercises: rotate and place {col,row} events, invalid placements ignored, one placement per tick, cyclic 240-piece queue, auto-discard of unplaceable pieces. The concept ran 90 s; this ships at 60 s to fit F1's 25–60 s range."
+}

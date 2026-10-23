@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, display_name TEXT NOT NULL, token_hash TEXT NOT NULL UNIQUE, rules_accepted_at DOUBLE PRECISION NOT NULL, created_at DOUBLE PRECISION NOT NULL);
+CREATE TABLE IF NOT EXISTS pools (id TEXT PRIMARY KEY, day TEXT NOT NULL, title TEXT NOT NULL, sponsor_name TEXT NOT NULL, created_at DOUBLE PRECISION NOT NULL);
+CREATE TABLE IF NOT EXISTS prizes (id TEXT PRIMARY KEY, pool_id TEXT NOT NULL REFERENCES pools(id), rank INTEGER NOT NULL, description TEXT NOT NULL, value_cents INTEGER NOT NULL, funded_by TEXT NOT NULL, UNIQUE (pool_id, rank));
+CREATE TABLE IF NOT EXISTS picks (player_id TEXT NOT NULL REFERENCES players(id), day TEXT NOT NULL, pool_id TEXT NOT NULL REFERENCES pools(id), created_at DOUBLE PRECISION NOT NULL, PRIMARY KEY (player_id, day));
+CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, player_id TEXT NOT NULL REFERENCES players(id), pool_id TEXT NOT NULL REFERENCES pools(id), day TEXT NOT NULL, score INTEGER NOT NULL, total_hits INTEGER NOT NULL, shots_fired INTEGER NOT NULL, ticks INTEGER NOT NULL, outcome TEXT NOT NULL, replay JSONB NOT NULL, status TEXT NOT NULL DEFAULT 'ok', created_at DOUBLE PRECISION NOT NULL);
+CREATE INDEX IF NOT EXISTS entries_pool_idx ON entries (pool_id);
+CREATE TABLE IF NOT EXISTS awards (prize_id TEXT PRIMARY KEY REFERENCES prizes(id), entry_id TEXT NOT NULL REFERENCES entries(id), player_id TEXT NOT NULL REFERENCES players(id), status TEXT NOT NULL DEFAULT 'pending_review', claim_email TEXT, created_at DOUBLE PRECISION NOT NULL);

@@ -1,0 +1,17 @@
+export type Vec = { x: number; y: number };
+export type Segment = { heading: number; ticks: number };
+export type TurkeyPlan = { spawnX: number; segments: Segment[] };
+export type WavePlan = { round: number; turkeys: TurkeyPlan[] };
+export type RunPlan = { seed: string; waves: WavePlan[] };
+export type TurkeyStatus = 'flying' | 'escaping' | 'falling' | 'gone';
+export type Turkey = { id: number; pos: Vec; vel: Vec; segIndex: number; segTicksLeft: number; age: number; status: TurkeyStatus };
+export type Arrow = { id: number; pos: Vec; vel: Vec };
+export type Input = { aimX: number; aimY: number; drawing: boolean };
+export type Phase = 'intermission' | 'playing' | 'over';
+export type Outcome = 'none' | 'cleared' | 'failed';
+export type GameState = { tick: number; phase: Phase; phaseTicks: number; waveIndex: number;
+  turkeys: Turkey[]; arrows: Arrow[]; arrowsLeft: number; drawTicks: number; wasDrawing: boolean;
+  score: number; roundHits: number; totalHits: number; shotsFired: number; outcome: Outcome; plan: RunPlan };
+export type InputRun = [count: number, aimX: number, aimY: number, drawing: 0 | 1];
+export type ReplayLog = { version: 1; seed: string; inputs: InputRun[] };
+export type ReplayResult = { ticks: number; score: number; totalHits: number; shotsFired: number; outcome: Outcome };

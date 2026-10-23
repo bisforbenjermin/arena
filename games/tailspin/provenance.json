@@ -1,0 +1,11 @@
+{
+  "gameId": "tailspin",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "human",
+  "parentLineage": null,
+  "authoredAt": "2026-10-23",
+  "license": "proprietary",
+  "ipClearance": "Original raccoon character drawn from primitive shapes; no third-party characters or assets. Hold-to-rise cave flying is a genre-standard mechanic and not protectable.",
+  "notes": "Hold control, ramp difficulty. Exercises: hold_start/hold_end events, integer physics, seeded corridor and gates drawn in init. Crashes cost the streak and 90 ticks of recovery rather than ending the round, so every round is exactly 3600 ticks. Sim discards 12 PRNG draws before use (see README)."
+}
