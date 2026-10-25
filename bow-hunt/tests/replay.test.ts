@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SEED } from '../src/engine/constants';
+import { BOWS, DEFAULT_SEED } from '../src/engine/constants';
 import { compressInputs, expandInputs, makeReplay, runReplay } from '../src/engine/replay';
 import { comboQuarters, hitPoints } from '../src/engine/scoring';
 import { generateRunPlan } from '../src/engine/plan';
@@ -26,8 +26,8 @@ describe('replay', () => {
   it('rescoring a JSON round-tripped log gives the live score, for every bot and seed', () => {
     for (const [name, mk] of bots) {
       for (let i = 0; i < 6; i++) {
-        const { state, inputs } = playRun(`replay-${name}-${i}`, mk());
-        const log = JSON.parse(JSON.stringify(makeReplay('daily', `replay-${name}-${i}`, inputs))) as ReplayLog;
+        const { state, inputs, picks } = playRun(`replay-${name}-${i}`, mk(), (r) => (i + r) % 2);
+        const log = JSON.parse(JSON.stringify(makeReplay('daily', `replay-${name}-${i}`, inputs, picks))) as ReplayLog;
         expect(runReplay(log), `${name} ${i}`).toEqual({
           ticks: state.tick, score: state.score, hits: state.stats.hits, shots: state.stats.shots,
           roundsCleared: state.summaries.filter((r) => r.passed).length, outcome: state.outcome,
@@ -55,9 +55,11 @@ describe('scoring in a real run', () => {
     let s = createInitialState(generateRunPlan(DEFAULT_SEED));
     const bot = makeLeadBot();
     const events: GameEvent[] = [];
+    const bowAt = new Map<number, number>();
     while (s.phase !== 'over') {
       if (s.phase === 'roundEnd') { s = nextRound(s); continue; }
       s = step(s, bot(s));
+      for (const e of s.events) if (e.type === 'fire') bowAt.set(e.arrowId, s.bow);
       events.push(...s.events);
     }
     let streak = 0, sawCombo = false;
@@ -67,12 +69,21 @@ describe('scoring in a real run', () => {
       if (e.type !== 'hit') continue;
       if (e.multi === 1) { streak += 1; arrowStreak.set(e.arrowId, streak); }
       expect(e.streak).toBe(arrowStreak.get(e.arrowId));
-      expect(e.points).toBe(hitPoints(e.species, e.long, e.streak, e.multi - 1));
+      expect(e.points).toBe(hitPoints(e.species, e.long, e.streak, e.multi - 1, BOWS[bowAt.get(e.arrowId) ?? 0].multiPct));
       if (comboQuarters(e.streak) > 4) sawCombo = true;
     }
     expect(sawCombo).toBe(true);
     const fromEvents = events.reduce((n, e) => n + (e.type === 'hit' ? e.points : e.type === 'roundEnd' ? e.summary.arrowBonus + e.summary.perfectBonus : e.type === 'starBonus' ? e.points : 0), 0);
     expect(fromEvents).toBe(s.score);
+  });
+});
+
+describe('bow choice', () => {
+  it('is part of the replay: the same shots with the other bow score differently', () => {
+    const { inputs, picks, state } = playRun('choice', makeLeadBot(), () => 1);
+    expect(picks.length).toBeGreaterThan(0);
+    expect(runReplay(makeReplay('daily', 'choice', inputs, picks)).score).toBe(state.score);
+    expect(runReplay(makeReplay('daily', 'choice', inputs, picks.map(() => 0))).score).not.toBe(state.score);
   });
 });
 
@@ -97,4 +108,4 @@ describe('golden scores', () => {
   });
 });
 
-const PINNED: number[] = [10938, 11790, 11041];
+const PINNED: number[] = [23347, 20925, 25480];

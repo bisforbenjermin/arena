@@ -1,5 +1,5 @@
 import {
-  MILLI as M, BOW_X, BOW_Y, LONG_RANGE, MULTI_HIT_BONUS, COMBO_STEP_QUARTERS, COMBO_MAX_STEPS,
+  MILLI as M, BOW_X, BOW_Y, LONG_RANGE, MULTI_BONUS, COMBO_STEP_QUARTERS, COMBO_MAX_STEPS,
 } from './constants';
 import { SPECIES, type Species } from './species';
 
@@ -16,10 +16,10 @@ export function comboQuarters(streak: number): number {
 
 /**
  * Points for one target hit.
- * base, +50% if long, times the combo multiplier, plus a flat bonus for each target this arrow already hit.
+ * base, +50% if long, times the combo multiplier, plus a flat bonus that climbs for a double, triple and quad.
  */
-export function hitPoints(species: Species, long: boolean, streak: number, priorHitsOnArrow: number): number {
+export function hitPoints(species: Species, long: boolean, streak: number, priorHitsOnArrow: number, multiPct = 100): number {
   const base = SPECIES[species].points;
   const withRange = base + (long ? Math.trunc(base / 2) : 0);
-  return Math.trunc(withRange * comboQuarters(streak) / 4) + priorHitsOnArrow * MULTI_HIT_BONUS;
+  return Math.trunc(withRange * comboQuarters(streak) / 4) + Math.trunc(MULTI_BONUS[Math.min(priorHitsOnArrow, MULTI_BONUS.length - 1)] * multiPct / 100);
 }

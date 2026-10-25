@@ -38,13 +38,13 @@ export type RoundSummary = {
   hitPoints: number; arrowBonus: number; perfectBonus: number; passed: boolean;
 };
 
-export type Stats = { shots: number; hits: number; longShots: number; multiHits: number; goldenHits: number; bestStreak: number; stars: number };
+export type Stats = { shots: number; hits: number; longShots: number; multiHits: number; goldenHits: number; bestStreak: number; stars: number; hummers: number; triples: number; quads: number };
 
 export type GameState = {
   tick: number; phase: Phase; phaseTicks: number; round: number; outcome: Outcome;
   targets: Target[]; arrows: Arrow[]; nextId: number;
   spawned: number; spawnTimer: number; outOfArrows: boolean;
-  arrowsLeft: number; drawTicks: number; wasDrawing: boolean;
+  arrowsLeft: number; drawTicks: number; wasDrawing: boolean; bow: number;
   score: number; roundHits: number; roundPoints: number; streak: number;
   stats: Stats; summaries: RoundSummary[]; events: GameEvent[];
   plan: RunPlan;
@@ -52,5 +52,6 @@ export type GameState = {
 
 export type Mode = 'daily' | 'practice';
 export type InputRun = [count: number, aimX: number, aimY: number, drawing: 0 | 1];
-export type ReplayLog = { version: 2; mode: Mode; seed: string; inputs: InputRun[] };
+/** picks: the A/B bow choice (0 or 1) at each upgrade, in order. */
+export type ReplayLog = { version: 3; mode: Mode; seed: string; inputs: InputRun[]; picks: number[] };
 export type ReplayResult = { ticks: number; score: number; hits: number; shots: number; roundsCleared: number; outcome: Outcome };

@@ -8,7 +8,8 @@ const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInt
 export function validateReplay(x: unknown): ReplayLog | null {
   if (typeof x !== 'object' || x === null) return null;
   const o = x as Record<string, unknown>;
-  if (o.version !== 2) return null;
+  if (o.version !== 3) return null;
+  if (!Array.isArray(o.picks) || o.picks.length > 4 || !o.picks.every((p) => p === 0 || p === 1)) return null;
   if (o.mode !== 'daily' && o.mode !== 'practice') return null;
   if (typeof o.seed !== 'string' || o.seed.length < 1 || o.seed.length > 64) return null;
   if (!Array.isArray(o.inputs)) return null;
@@ -23,5 +24,5 @@ export function validateReplay(x: unknown): ReplayLog | null {
     total += count;
     if (total > MAX_REPLAY_TICKS) return null;
   }
-  return { version: 2, mode: o.mode, seed: o.seed, inputs: o.inputs as ReplayLog['inputs'] };
+  return { version: 3, mode: o.mode, seed: o.seed, inputs: o.inputs as ReplayLog['inputs'], picks: o.picks as number[] };
 }

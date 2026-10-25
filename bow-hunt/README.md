@@ -7,11 +7,19 @@ Portrait mobile archery game. Ducks, geese, turkeys and a rare golden turkey cro
 - **Aim and shoot:** press anywhere, drag back like a bowstring, let go. The arrow flies opposite the drag. Holding longer draws harder; the ring turns gold at full power.
 - **Keyboard:** ← → (or A/D) swing the bow, ↑ re-centers it, hold space to draw, let go to shoot. Esc or P pauses. On the title, Enter starts the daily hunt and space starts practice.
 - **Rounds:** 5 rounds of 10 birds with 15 arrows each. Hit the round's quota (5, 6, 6, 7, 8) to move on. Miss it and the hunt is over. Birds get faster and change height more often each round.
-- **Bow upgrades:** clearing round 1 gives a recurve bow, clearing round 3 a compound bow. Each draws faster and shoots harder (flatter arcs).
-- **Shooting stars:** one crosses each round, high and fast. Each pays 250, and hitting 3 in one hunt adds 3,000. Stars don't count toward the quota.
+- **Bow choices:** after clearing round 1, pick A or B; again after round 3. The choice is recorded in the replay log, so a re-scored run uses the same bows.
+
+  | After | A | B |
+  |---|---|---|
+  | Round 1 | Recurve bow: quick draw, 17 arrows | Longbow: slow draw, 14 arrows, double multi-kill bonus |
+  | Round 3 | Compound bow: fastest draw, 17 arrows | Crossbow: dead-flat bolts, only 11 |
+
+- **Bonus targets** (don't count toward the quota):
+  - **Shooting stars:** one per round, high and fast. Each pays 250; hitting 3 in one hunt adds 3,000.
+  - **Hummingbirds:** about every other round, one zips across just under the HUD. Tiny and very fast. Pays 2,000.
+- **Multi-kills:** arrows pass through what they hit. A second bird on one arrow pays +200, a third +600, a fourth +1,500 (doubled with the Longbow). From round 2, some rounds send 3 birds (4 from round 4) in a slanted line, so a triple or quad is possible but takes a well-timed, well-aimed shot.
 - **Points:** goose 75, turkey 100, duck 150, golden turkey 1,000 (about one round in six has one).
   - Hits more than 600 units from the bow pay +50%.
-  - An arrow passes through what it hits, so each extra bird on one arrow adds +200.
   - Each arrow that hits after another adds +25% to the combo, up to ×3. A miss resets it.
   - Unused arrows pay 25 each when you pass a round. A perfect round adds 1,000.
 - **Modes:**
@@ -23,7 +31,7 @@ Portrait mobile archery game. Ducks, geese, turkeys and a rare golden turkey cro
 
 ```
 npm install
-npm test            # 47 tests: engine rules, scoring, replay, skill gradient, aim mapping, run loop
+npm test            # 51 tests: engine rules, scoring, replay, skill gradient, aim mapping, run loop
 npm run dev         # http://localhost:5173
 npm run dev:phone   # same, reachable from a phone on your Wi-Fi (open the Network URL it prints)
 npm run build       # static site in dist/
@@ -55,7 +63,7 @@ src/testing/   lead, naive and random bots for tests
 ```
 
 - **Determinism:** the engine draws every random value up front from the seed, steps at a fixed 60 Hz, and uses only integer math. Bird paths come from a hardcoded sine table, because native sine can differ between JavaScript engines. A test bans `Math.random`, `Date` and float trig in `src/engine/`.
-- **Replays:** the game records the input for every tick: aim point and whether the bow is drawn. `runReplay` re-runs the hunt from the seed and those inputs. The game-over card runs that check and shows the result, and the server will run the same check in Phase 2.
+- **Replays:** the game records the input for every tick (aim point and whether the bow is drawn) plus each A/B bow pick. `runReplay` re-runs the hunt from the seed and those inputs. The game-over card runs that check and shows the result, and the server will run the same check in Phase 2.
 - **Skill:** the tests check that the bot that leads its birds scores more than three times the one that aims straight at them, which in turn beats random shooting. Three golden scores are pinned, so any balance change shows up in CI.
 
 ## Open items

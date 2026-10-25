@@ -58,7 +58,9 @@ describe('validateReplay', () => {
     expect(validateReplay({ ...ok, inputs: [[1, 541, 100, 0]] })).toBeNull();
     expect(validateReplay({ ...ok, inputs: [[1, 270, 961, 0]] })).toBeNull();
     expect(validateReplay({ ...ok, inputs: [[1, 270, 100, 2]] })).toBeNull();
-    expect(validateReplay({ ...ok, version: 1 })).toBeNull();
+    expect(validateReplay({ ...ok, version: 2 })).toBeNull();
+    expect(validateReplay({ ...ok, picks: [2] })).toBeNull();
+    expect(validateReplay({ ...ok, picks: undefined })).toBeNull();
     expect(validateReplay({ ...ok, mode: 'ranked' })).toBeNull();
     expect(validateReplay({ ...ok, inputs: [[25000, 270, 100, 0], [1, 270, 100, 1]] })).toBeNull();
     expect(validateReplay(null)).toBeNull();

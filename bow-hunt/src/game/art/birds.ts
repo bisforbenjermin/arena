@@ -4,7 +4,7 @@ import { circle, ellipse, sticker, type Ctx } from './canvas';
 
 export const WING_FRAMES = [-0.15, -1.35, -2.55] as const;   // radians from straight up, toward the tail
 export const BIRD_CANVAS: Record<Exclude<Species, 'star'>, [number, number]> = {
-  duck: [160, 120], goose: [230, 160], turkey: [210, 170], golden: [210, 170],
+  duck: [160, 120], goose: [230, 160], turkey: [210, 170], golden: [210, 170], hummer: [120, 90],
 };
 
 type WingStyle = { len: number; wid: number; fill: string; edge: string; accent?: string; bars?: string };
@@ -131,8 +131,34 @@ function turkey(ctx: Ctx, a: number, p: TurkeyPalette): void {
   wing(ctx, -4, -6, a, w);
 }
 
+/** Ruby-throated hummingbird: emerald back, red throat, needle bill, wings a blur. */
+function hummer(ctx: Ctx, a: number): void {
+  const blur = (angle: number, alpha: number) => {
+    ctx.save();
+    ctx.translate(-2, -6);
+    ctx.rotate(angle);
+    ctx.beginPath(); ctx.ellipse(0, -20, 8, 24, 0, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(220,240,235,${alpha})`; ctx.fill();
+    ctx.restore();
+  };
+  const sweep = a === WING_FRAMES[0] ? -0.6 : a === WING_FRAMES[1] ? -1.5 : -2.3;
+  blur(sweep - 0.35, 0.35); blur(sweep, 0.6);
+  ctx.beginPath(); ctx.moveTo(-14, 2); ctx.lineTo(-34, -2); ctx.lineTo(-32, 8); ctx.closePath(); ctx.fillStyle = '#20402F'; ctx.fill();
+  const g = ctx.createLinearGradient(0, -12, 0, 12);
+  g.addColorStop(0, '#3FBF7F'); g.addColorStop(1, '#1D6E4A');
+  ellipse(ctx, -2, 2, 18, 10, g, -0.15);
+  ellipse(ctx, 2, 7, 10, 5, '#F2EEE6', -0.1);
+  circle(ctx, 14, -4, 9, '#2E9E6B');
+  ellipse(ctx, 15, 3, 6, 5, '#D7263D');
+  ctx.strokeStyle = '#14100E'; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(22, -4); ctx.lineTo(44, -2); ctx.stroke();
+  circle(ctx, 17, -6, 2, '#14100E');
+  blur(sweep + 0.25, 0.7);
+}
+
 function drawSpecies(ctx: Ctx, species: Species, a: number): void {
-  if (species === 'duck') duck(ctx, a);
+  if (species === 'hummer') hummer(ctx, a);
+  else if (species === 'duck') duck(ctx, a);
   else if (species === 'goose') goose(ctx, a);
   else turkey(ctx, a, species === 'golden' ? GOLDEN : WILD);
 }

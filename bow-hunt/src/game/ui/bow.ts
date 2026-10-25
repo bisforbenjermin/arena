@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BOW_TIERS, BOW_X, BOW_Y, DRAW_MIN_TICKS, MILLI } from '../../engine/constants';
+import { BOWS, BOW_X, BOW_Y, DRAW_MIN_TICKS, MILLI } from '../../engine/constants';
 import { previewPath } from '../../engine/preview';
 import { BOW_TIP } from '../art/props';
 import { DEPTH, N, S } from '../config';
@@ -32,10 +32,10 @@ export class BowView {
     this.update({ aimX: BOW_X, aimY: 0, angle: 0 }, 0, true, false);
   }
 
-  /** Swaps in the upgraded bow. */
-  setTier(t: number): void {
-    this.tier = t;
-    this.bowImg.setTexture(`bow-${t}`);
+  /** Swaps in the chosen bow (index into BOWS). */
+  setBow(i: number): void {
+    this.tier = i;
+    this.bowImg.setTexture(`bow-${i}`);
   }
 
   /** `draw` is the engine's draw ticks; `armed` is false when the quiver is empty. */
@@ -43,7 +43,7 @@ export class BowView {
     // ease toward the aim so the bow doesn't jitter under a thumb
     this.angle += (aim.angle - this.angle) * 0.6;
     this.root.setRotation(this.angle - Math.PI / 2);
-    const drawMax = BOW_TIERS[this.tier].drawMax;
+    const drawMax = BOWS[this.tier].drawMax;
     const p = Math.min(draw, drawMax) / drawMax;
     const pull = MAX_PULL * Math.sin(p * Math.PI / 2);
     const nockX = BOW_TIP.x - (armed ? pull : 0);

@@ -1,5 +1,5 @@
 import { generateRunPlan } from './plan';
-import { createInitialState, nextRound, step } from './sim';
+import { createInitialState, nextRound, step, upgradeAfter } from './sim';
 import type { GameState, Input, InputRun, Mode, ReplayLog, ReplayResult } from './types';
 
 export function compressInputs(inputs: Input[]): InputRun[] {
@@ -21,8 +21,8 @@ export function expandInputs(runs: InputRun[]): Input[] {
   return out;
 }
 
-export function makeReplay(mode: Mode, seed: string, inputs: Input[]): ReplayLog {
-  return { version: 2, mode, seed, inputs: compressInputs(inputs) };
+export function makeReplay(mode: Mode, seed: string, inputs: Input[], picks: number[] = []): ReplayLog {
+  return { version: 3, mode, seed, inputs: compressInputs(inputs), picks };
 }
 
 /**
@@ -30,12 +30,14 @@ export function makeReplay(mode: Mode, seed: string, inputs: Input[]): ReplayLog
  * between rounds the live game waits on a tap, so the replay starts the next round wherever the last one ended.
  */
 export function replayState(log: ReplayLog): GameState {
-  if (log.version !== 2) throw new Error('Unsupported replay version');
+  if (log.version !== 3) throw new Error('Unsupported replay version');
   let state = createInitialState(generateRunPlan(log.seed));
+  let pickIndex = 0;
+  const advance = (s: GameState) => (upgradeAfter(s.round) ? nextRound(s, log.picks[pickIndex++] ?? 0) : nextRound(s));
   for (const [count, aimX, aimY, d] of log.inputs) {
     const input: Input = { aimX, aimY, drawing: d === 1 };
     for (let k = 0; k < count; k++) {
-      if (state.phase === 'roundEnd') state = nextRound(state);
+      if (state.phase === 'roundEnd') state = advance(state);
       if (state.phase === 'over') return state;
       state = step(state, input);
     }

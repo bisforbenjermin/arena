@@ -119,6 +119,14 @@ class Sfx {
     for (let i = 0; i < n; i++) this.tone('triangle', 880 * (1 + i * 0.26), 900 * (1 + i * 0.26), t + 0.12 + i * 0.06, { d: 0.12, peak: 0.22 });
   }
 
+  /** Hummingbird zipping past: a fast buzzing sweep. */
+  zip(): void {
+    if (!this.ready) return;
+    const t = this.ctx!.currentTime;
+    this.tone('sawtooth', 180, 120, t, { a: 0.05, d: 0.6, peak: 0.06 });
+    this.noise(t, { a: 0.05, d: 0.55, peak: 0.08 }, 'bandpass', 300, 1800, 8);
+  }
+
   landed(): void {
     if (!this.ready) return;
     this.noise(this.ctx!.currentTime, { d: 0.12, peak: 0.12 }, 'lowpass', 500, 200);

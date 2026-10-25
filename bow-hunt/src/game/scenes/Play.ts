@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { BOW_TIERS, MILLI as M, GROUND_Y, STARS_FOR_BONUS } from '../../engine/constants';
-import { tierFor } from '../../engine/sim';
+import { BOWS, MILLI as M, GROUND_Y, STARS_FOR_BONUS } from '../../engine/constants';
+import { isBonus } from '../../engine/species';
+import { upgradeAfter } from '../../engine/sim';
 import type { GameEvent, Mode, Target } from '../../engine/types';
 import { sfx } from '../audio/sfx';
 import { C, DEPTH, N, S, VIEW_H, VIEW_W } from '../config';
@@ -57,8 +58,8 @@ export class PlayScene extends Phaser.Scene {
     this.hud = new Hud(this, this.mode);
     this.bow = new BowView(this, this.mode === 'practice');
     this.hud.setRound(0);
-    this.hud.setBow(BOW_TIERS[0].name);
-    this.hud.setArrows(this.run.state.arrowsLeft);
+    this.hud.setBow(BOWS[0].name);
+    this.hud.setArrows(this.run.state.arrowsLeft, BOWS[this.run.state.bow].arrows);
     this.startRoundBanner();
 
     const pauseBtn = iconButton(this, 868, 262, drawPause, () => this.setPaused(true));
@@ -132,24 +133,33 @@ export class PlayScene extends Phaser.Scene {
       case 'fire': {
         sfx.release(e.power);
         this.bow.kick();
-        this.hud.setArrows(st.arrowsLeft);
+        this.hud.setArrows(st.arrowsLeft, BOWS[st.bow].arrows);
         break;
       }
       case 'hit': {
         const x = e.x / M * S, y = e.y / M * S;
         const view = this.birds.get(e.targetId);
         if (view) { this.fx.flash(view.sprite); view.sprite.stop(); view.sprite.setFrame(0); view.spin = (view.sprite.flipX ? -1 : 1) * (0.1 + Math.random() * 0.06); }
-        const golden = e.species === 'golden' || e.species === 'star';
+        const golden = e.species === 'golden' || isBonus(e.species);
         this.fx.burst(x, y, e.species);
         this.fx.shake(golden || e.multi >= 2 ? 'big' : 'small');
         this.fx.points(x, y - 30, e.points, golden);
         let noteY = y + 50, delay = 120;
-        if (e.multi >= 2) { this.fx.note(x, noteY, e.multi === 2 ? 'Double!' : e.multi === 3 ? 'Triple!' : `${e.multi} in one!`, C.paper, delay); noteY += 52; delay += 80; sfx.multi(e.multi); }
+        if (e.multi >= 2) {
+          const label = e.multi === 2 ? 'Double!' : e.multi === 3 ? 'Triple!' : e.multi === 4 ? 'Quad!' : `${e.multi} in one!`;
+          this.fx.note(x, noteY, label, e.multi >= 3 ? C.gold : C.paper, delay); noteY += 52; delay += 80; sfx.multi(e.multi);
+          if (e.multi >= 3) { this.fx.shake('big'); this.hud.notice(e.multi >= 4 ? 'QUAD KILL' : 'TRIPLE KILL'); }
+        }
         if (e.long) this.fx.note(x, noteY, 'Long shot', C.gold, delay);
         if (e.species === 'star') { this.hud.setStars(st.stats.stars); this.fx.note(x, y + 50, `Star ${st.stats.stars} of ${STARS_FOR_BONUS}`, C.gold, 100); }
+        else if (e.species === 'hummer') { this.fx.note(x, y + 50, 'Hummingbird!', C.gold, 100); this.fx.shake('big'); }
         else this.hud.markHit(e.species === 'golden');
         this.hud.setScore(st.score);
         sfx.hit(e.species, e.streak);
+        break;
+      }
+      case 'spawn': {
+        if (e.species === 'hummer') sfx.zip();
         break;
       }
       case 'starBonus': {
@@ -160,7 +170,7 @@ export class PlayScene extends Phaser.Scene {
         break;
       }
       case 'escape': {
-        if (this.wasStar(e.targetId)) { this.dropBird(e.targetId); break; }
+        if (this.wasBonus(e.targetId)) { this.dropBird(e.targetId); break; }
         this.hud.markMissed();
         sfx.escape();
         this.dropBird(e.targetId);
@@ -186,8 +196,8 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
-  private wasStar(id: number): boolean {
-    return this.run.prev.targets.some((t) => t.id === id && t.species === 'star');
+  private wasBonus(id: number): boolean {
+    return this.run.prev.targets.some((t) => t.id === id && isBonus(t.species));
   }
 
   private dropBird(id: number): void {
@@ -201,10 +211,10 @@ export class PlayScene extends Phaser.Scene {
   private makeBird(t: Target): BirdView {
     // golden art is drawn on the turkey body but its hit circle is smaller (26 vs 30), so shrink it to match
     // Art is drawn a bit smaller than the (generous) hit circles; scale it up partway. Golden turkeys are smaller turkeys.
-    const scale = t.species === 'golden' ? 1.25 * 42 / 49 : 1.25;
+    const scale = t.species === 'golden' ? 1.25 * 42 / 49 : t.species === 'hummer' ? 1.1 : 1.25;
     const sprite = this.add.sprite(0, 0, t.species === 'star' ? 'star' : `${t.species}-0`).setDepth(DEPTH.birds).setFlipX(t.dir < 0).setScale(t.species === 'star' ? 1 : scale);
     if (t.species !== 'star') sprite.play({ key: `${t.species}-flap`, startFrame: Math.floor(Math.random() * 4) });
-    const glow = t.species === 'golden' || t.species === 'star'
+    const glow = t.species === 'golden' || t.species === 'star' || t.species === 'hummer'
       ? this.add.image(0, 0, 'glow').setDepth(DEPTH.birds - 1).setBlendMode(Phaser.BlendModes.ADD).setScale(1.1)
       : undefined;
     return { sprite, glow, spin: 0, age: 0 };
@@ -232,6 +242,10 @@ export class PlayScene extends Phaser.Scene {
           if (v.age % 3 === 0) this.fx.sparkleTrail(x - t.dir * 50, y + (Math.random() - 0.5) * 20);
           continue;
         }
+        if (t.species === 'hummer' && v.glow) {
+          v.glow.setPosition(x, y).setScale(0.6).setAlpha(0.45);
+          if (v.age % 2 === 0) this.fx.sparkleTrail(x - t.dir * 30, y);
+        }
         const tilt = Phaser.Math.Clamp(t.vy / Math.max(Math.abs(t.vx), 1) * 0.6, -0.5, 0.5) * (t.dir > 0 ? 1 : -1);
         v.sprite.rotation = t.status === 'fleeing' ? -0.45 * t.dir : tilt;
         if (v.glow) {
@@ -255,7 +269,7 @@ export class PlayScene extends Phaser.Scene {
 
     const armed = cur.phase === 'playing' && cur.arrowsLeft > 0;
     this.bow.update(this.aim, cur.drawTicks, armed || cur.phase === 'intro', this.drawing && cur.phase === 'playing');
-    const full = cur.drawTicks >= BOW_TIERS[tierFor(cur.round)].drawMax;
+    const full = cur.drawTicks >= BOWS[cur.bow].drawMax;
     if (full && !this.wasFull && armed) sfx.fullDraw();
     this.wasFull = full;
   }
@@ -276,8 +290,9 @@ export class PlayScene extends Phaser.Scene {
     if (st.phase === 'roundEnd') {
       sfx.roundClear();
       this.time.delayedCall(650, () => {
-        const upgrade = tierFor(st.round + 1) > tierFor(st.round) ? BOW_TIERS[tierFor(st.round + 1)].name : undefined;
-        this.scene.launch('Results', { summary, score: st.score, upgrade, onNext: () => this.continueRun() });
+        const offer = upgradeAfter(st.round);
+        const choices = offer ? [offer[0], offer[1]] : undefined;
+        this.scene.launch('Results', { summary, score: st.score, choices, current: BOWS[st.bow], onNext: (pick: number) => this.continueRun(pick) });
         this.scene.pause();
       });
     } else {
@@ -291,17 +306,18 @@ export class PlayScene extends Phaser.Scene {
   }
 
   /** Called by the Results card's Next round button. */
-  continueRun(): void {
-    this.run.nextRound();
+  continueRun(pick = 0): void {
+    const before = this.run.state.bow;
+    this.run.nextRound(pick);
     this.ending = false;
     this.wasFull = false;
     for (const img of this.arrows.values()) img.destroy();
     this.arrows.clear();
     this.hud.setRound(this.run.state.round);
-    this.hud.setArrows(this.run.state.arrowsLeft);
+    const bow = this.run.state.bow;
+    this.hud.setArrows(this.run.state.arrowsLeft, BOWS[bow].arrows);
     this.hud.setStreak(this.run.state.streak);
-    const tier = tierFor(this.run.state.round);
-    if (tier !== tierFor(this.run.state.round - 1)) { this.bow.setTier(tier); this.bow.celebrate(); this.hud.setBow(BOW_TIERS[tier].name); }
+    if (bow !== before) { this.bow.setBow(bow); this.bow.celebrate(); this.hud.setBow(BOWS[bow].name); }
     this.scene.resume();
     this.startRoundBanner();
   }

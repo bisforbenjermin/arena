@@ -4,7 +4,7 @@ import { birdFrames } from './birds';
 import { drawBackdrop, drawCloud, drawForeground } from './scenery';
 import { drawArrow, drawBow, drawGlow, drawStar, drawPuff, drawQuiverArrow, drawSheet, drawSparkle, paintFeather, paintLeaf, paintPip, SHEET_CELL } from './props';
 
-export const SPECIES_LIST: Species[] = ['duck', 'goose', 'turkey', 'golden', 'star'];
+export const SPECIES_LIST: Species[] = ['duck', 'goose', 'turkey', 'golden', 'star', 'hummer'];
 export const BIRDS: Species[] = ['duck', 'goose', 'turkey', 'golden'];
 
 export const FEATHER_COLORS: Record<Species, string[]> = {
@@ -13,6 +13,7 @@ export const FEATHER_COLORS: Record<Species, string[]> = {
   turkey: ['#6B4A2E', '#C8893A', '#EAD7AE', '#4F3626'],
   golden: ['#F2C14E', '#FFE08A', '#FFF6D1', '#E0A52A'],
   star: ['#FFF6D1', '#F2C14E', '#FFE08A', '#FFFFFF'],
+  hummer: ['#3FBF7F', '#D7263D', '#1D6E4A', '#F2EEE6'],
 };
 export const LEAF_COLORS = ['#B4532A', '#D9822B', '#E2B33C', '#9E3B27'];
 export const PIP_FRAMES = { pending: 0, hit: 1, gold: 2, missed: 3 } as const;
@@ -23,7 +24,7 @@ function addSheet(tx: Phaser.Textures.TextureManager, key: string, canvas: HTMLC
   const t = tx.addCanvas(key, canvas)!;
   for (let i = 0; i < n; i++) t.add(i, 0, i * SHEET_CELL.w, 0, SHEET_CELL.w, SHEET_CELL.h);
 }
-const FLAP_RATE: Record<Species, number> = { duck: 14, goose: 7, turkey: 10, golden: 16, star: 0 };
+const FLAP_RATE: Record<Species, number> = { duck: 14, goose: 7, turkey: 10, golden: 16, star: 0, hummer: 40 };
 
 /** Draws every texture once and registers the flap animations. */
 export function registerArt(scene: Phaser.Scene): void {
@@ -35,7 +36,7 @@ export function registerArt(scene: Phaser.Scene): void {
   add('cloud-1', drawCloud(240, 23));
   add('cloud-2', drawCloud(420, 37));
   add('arrow', drawArrow());
-  for (let t = 0; t < 3; t++) add(`bow-${t}`, drawBow(t));
+  for (let t = 0; t < 5; t++) add(`bow-${t}`, drawBow(t));
   add('star', drawStar());
   add('sparkle', drawSparkle());
   add('puff', drawPuff());

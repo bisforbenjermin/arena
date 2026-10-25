@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ARROWS_PER_ROUND, ROUNDS, ROUND_QUOTA, STARS_FOR_BONUS, TARGETS_PER_ROUND } from '../../engine/constants';
+import { BOWS, ROUNDS, ROUND_QUOTA, STARS_FOR_BONUS, TARGETS_PER_ROUND } from '../../engine/constants';
 import { comboQuarters } from '../../engine/scoring';
 import type { Mode } from '../../engine/types';
 import { C, DEPTH, N } from '../config';
@@ -55,10 +55,11 @@ export class Hud {
     this.quotaMark.add(text(scene, 0, 40, '', { size: 30, font: 'hand', color: C.paper, stroke: 5, align: 'center' }).setOrigin(0.5, 0));
 
     // quiver, bottom left
-    for (let i = 0; i < ARROWS_PER_ROUND; i++) {
-      this.quiver.push(scene.add.image(56 + i * 15, 1830, 'quiver-arrow').setDepth(d).setRotation(-0.12 + i * 0.012));
+    const most = Math.max(...BOWS.map((b) => b.arrows));
+    for (let i = 0; i < most; i++) {
+      this.quiver.push(scene.add.image(56 + i * 14, 1830, 'quiver-arrow').setDepth(d).setRotation(-0.12 + i * 0.012));
     }
-    this.quiverText = text(scene, 300, 1790, '15', { size: 58, color: C.paper, stroke: 8 }).setDepth(d);
+    this.quiverText = text(scene, 56 + most * 14 + 16, 1790, '15', { size: 58, color: C.paper, stroke: 8 }).setDepth(d);
 
     this.bowText = text(scene, 50, 1716, '', { size: 34, font: 'hand', color: C.paper, stroke: 5 }).setDepth(d);
 
@@ -127,8 +128,9 @@ export class Hud {
     this.bowText.setText(name);
   }
 
-  setArrows(left: number): void {
-    this.quiver.forEach((img, i) => img.setAlpha(i < left ? 1 : 0.18));
+  /** `total` is this bow's quiver size; slots past it are hidden. */
+  setArrows(left: number, total = 15): void {
+    this.quiver.forEach((img, i) => img.setVisible(i < total).setAlpha(i < left ? 1 : 0.18));
     this.quiverText.setText(String(left)).setColor(left <= 3 ? C.gold : C.paper);
   }
 

@@ -1,37 +1,42 @@
 import {
-  MILLI as M, ROUNDS, TARGETS_PER_ROUND, ARROWS_PER_ROUND, MAX_ON_SCREEN, ROUND_QUOTA, INTRO_TICKS,
-  FIRST_SPAWN_TICKS, DRAW_MIN_TICKS, PERFECT_ROUND_BONUS, ARROW_LEFT_BONUS, BOW_TIERS, TIER_BY_ROUND,
+  MILLI as M, ROUNDS, TARGETS_PER_ROUND, MAX_ON_SCREEN, ROUND_QUOTA, INTRO_TICKS,
+  FIRST_SPAWN_TICKS, DRAW_MIN_TICKS, PERFECT_ROUND_BONUS, ARROW_LEFT_BONUS, BOWS, UPGRADES,
   STARS_FOR_BONUS, STAR_BONUS,
 } from './constants';
-import { SPECIES } from './species';
+import { SPECIES, isBonus } from './species';
 import { fireArrow, stepArrow, arrowOut, segmentHitsCircle } from './arrows';
 import { spawnTarget, stepTarget, fleeTarget, hitTarget, isHittable } from './targets';
 import { hitPoints, isLongShot } from './scoring';
 import type { Arrow, GameEvent, GameState, Input, RoundSummary, RunPlan, Target } from './types';
 
-/** Which bow the player has in a round: upgrades come from clearing rounds, so everyone on a seed gets the same ones. */
-export function tierFor(round: number): number {
-  return TIER_BY_ROUND[round];
+/** The two bows offered after clearing `round`, or undefined when that round brings no upgrade. */
+export function upgradeAfter(round: number): readonly [number, number] | undefined {
+  return UPGRADES[round];
 }
 
 export function createInitialState(plan: RunPlan): GameState {
   return {
     tick: 0, phase: 'intro', phaseTicks: 0, round: 0, outcome: 'none',
     targets: [], arrows: [], nextId: 0, spawned: 0, spawnTimer: FIRST_SPAWN_TICKS, outOfArrows: false,
-    arrowsLeft: ARROWS_PER_ROUND, drawTicks: 0, wasDrawing: false,
+    arrowsLeft: BOWS[0].arrows, drawTicks: 0, wasDrawing: false, bow: 0,
     score: 0, roundHits: 0, roundPoints: 0, streak: 0,
-    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0, stars: 0 },
+    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0, stars: 0, hummers: 0, triples: 0, quads: 0 },
     summaries: [], events: [], plan,
   };
 }
 
-/** Starts the next round after a 'roundEnd'. The view calls it when the player taps Next Round. */
-export function nextRound(s: GameState): GameState {
+/**
+ * Starts the next round after a 'roundEnd'. The view calls it when the player taps Next Round.
+ * After an upgrade round, `pick` (0 = A, 1 = B) chooses the new bow; the replay log records it.
+ */
+export function nextRound(s: GameState, pick = 0): GameState {
   if (s.phase !== 'roundEnd') return s;
+  const offer = upgradeAfter(s.round);
+  const bow = offer ? offer[pick === 1 ? 1 : 0] : s.bow;
   return {
-    ...s, round: s.round + 1, phase: 'intro', phaseTicks: 0,
+    ...s, round: s.round + 1, phase: 'intro', phaseTicks: 0, bow,
     targets: [], arrows: [], spawned: 0, spawnTimer: FIRST_SPAWN_TICKS, outOfArrows: false,
-    arrowsLeft: ARROWS_PER_ROUND, drawTicks: 0, wasDrawing: false, roundHits: 0, roundPoints: 0, events: [],
+    arrowsLeft: BOWS[bow].arrows, drawTicks: 0, wasDrawing: false, roundHits: 0, roundPoints: 0, events: [],
   };
 }
 
@@ -52,7 +57,7 @@ export function step(s: GameState, input: Input): GameState {
 
   const round = s.round;
   const roundPlan = s.plan.rounds[round];
-  const tier = tierFor(round);
+  const bow = s.bow;
   const total = roundPlan.targets.length;
   let { nextId, arrowsLeft, drawTicks, streak, score, roundHits, roundPoints, spawned, spawnTimer, outOfArrows } = s;
   const stats = { ...s.stats };
@@ -60,10 +65,10 @@ export function step(s: GameState, input: Input): GameState {
   // a. Bow: hold to draw, release to fire.
   let arrows: Arrow[] = s.arrows;
   if (input.drawing) {
-    drawTicks = Math.min(drawTicks + 1, BOW_TIERS[tier].drawMax);
+    drawTicks = Math.min(drawTicks + 1, BOWS[bow].drawMax);
   } else if (s.wasDrawing) {
     if (drawTicks >= DRAW_MIN_TICKS && arrowsLeft > 0) {
-      const a = fireArrow(drawTicks, input.aimX, input.aimY, nextId++, tier);
+      const a = fireArrow(drawTicks, input.aimX, input.aimY, nextId++, bow);
       arrows = [...arrows, a];
       arrowsLeft -= 1;
       stats.shots += 1;
@@ -85,7 +90,7 @@ export function step(s: GameState, input: Input): GameState {
   // c. Spawn the next target once its gap has passed and a slot is free.
   if (!outOfArrows && spawned < total) {
     spawnTimer -= 1;
-    const flying = targets.reduce((n, t) => n + (t.status === 'flying' && t.species !== 'star' ? 1 : 0), 0);
+    const flying = targets.reduce((n, t) => n + (t.status === 'flying' && !isBonus(t.species) ? 1 : 0), 0);
     if (spawnTimer <= 0 && flying < MAX_ON_SCREEN) {
       const t = spawnTarget(roundPlan.targets[spawned], round, nextId++, spawned);
       targets.push(t);
@@ -109,12 +114,15 @@ export function step(s: GameState, input: Input): GameState {
         if (streak > stats.bestStreak) stats.bestStreak = streak;
       }
       const long = isLongShot(t.x, t.y);
-      const points = hitPoints(t.species, long, a.streakAt, a.hits);
+      const points = hitPoints(t.species, long, a.streakAt, a.hits, BOWS[bow].multiPct);
       if (a.hits >= 1) stats.multiHits += 1;
       a = { ...a, hits: a.hits + 1 };
+      if (a.hits === 3) stats.triples += 1;
+      if (a.hits === 4) stats.quads += 1;
       targets[i] = hitTarget(t);
       score += points; roundPoints += points;
-      if (t.species !== 'star') { roundHits += 1; stats.hits += 1; }
+      if (!isBonus(t.species)) { roundHits += 1; stats.hits += 1; }
+      if (t.species === 'hummer') stats.hummers += 1;
       if (long) stats.longShots += 1;
       if (t.species === 'golden') stats.goldenHits += 1;
       events.push({ type: 'hit', targetId: t.id, arrowId: a.id, species: t.species, x: t.x, y: t.y, points, long, multi: a.hits, streak: a.streakAt });

@@ -1,9 +1,9 @@
 // Test bots. They only produce inputs, so they may use floating point; the sim never sees anything but the ints they emit.
-import { MILLI as M, BOW_X, BOW_Y, WORLD_W, WORLD_H, ARROW_GRAVITY, BOW_TIERS } from '../engine/constants';
+import { MILLI as M, BOW_X, BOW_Y, WORLD_W, WORLD_H, ARROW_GRAVITY, BOWS } from '../engine/constants';
 import { launchSpeed } from '../engine/arrows';
 import { stepTarget, isHittable } from '../engine/targets';
 import { generateRunPlan } from '../engine/plan';
-import { createInitialState, nextRound, step, tierFor } from '../engine/sim';
+import { createInitialState, nextRound, step, upgradeAfter } from '../engine/sim';
 import type { GameState, Input, Target } from '../engine/types';
 
 export type Bot = (s: GameState) => Input;
@@ -16,14 +16,13 @@ const clampAim = (x: number, y: number): Input => ({
 });
 
 function firstTarget(s: GameState): Target | undefined {
-  return s.targets.find((t) => t.status === 'flying' && t.species !== 'star') ?? s.targets.find((t) => t.status === 'flying');
+  return s.targets.find((t) => t.status === 'flying' && t.species !== 'star' && t.species !== 'hummer') ?? s.targets.find((t) => t.status === 'flying');
 }
 
 /** Aims where the target will be when a full-power arrow can get there. */
 export function leadAim(s: GameState, target: Target): Input {
   const tp = s.plan.rounds[s.round].targets[target.slot];
-  const tier = tierFor(s.round);
-  const v = launchSpeed(BOW_TIERS[tier].drawMax, tier) / M;
+  const v = launchSpeed(BOWS[s.bow].drawMax, s.bow) / M;
   const g = ARROW_GRAVITY / M;
   let t = target;
   for (let n = 1; n <= 120; n++) {
@@ -44,7 +43,7 @@ function drawCycle(aim: (s: GameState) => Input | null): Bot {
   let held = 0;
   return (s) => {
     if (s.phase !== 'playing') { held = 0; return IDLE; }
-    if (held < BOW_TIERS[tierFor(s.round)].drawMax) {
+    if (held < BOWS[s.bow].drawMax) {
       if (!firstTarget(s) && held === 0) return IDLE;
       held += 1;
       return { ...IDLE, drawing: true };
@@ -70,14 +69,18 @@ export function makeRandomBot(next: () => number): Bot {
 }
 
 /** Plays a whole run with a bot, tapping Next Round instantly. Returns the end state and the inputs it used. */
-export function playRun(seed: string, bot: Bot): { state: GameState; inputs: Input[] } {
+export function playRun(seed: string, bot: Bot, choose: (round: number) => number = () => 0): { state: GameState; inputs: Input[]; picks: number[] } {
   let s = createInitialState(generateRunPlan(seed));
   const inputs: Input[] = [];
+  const picks: number[] = [];
   while (s.phase !== 'over' && inputs.length < 30000) {
-    if (s.phase === 'roundEnd') { s = nextRound(s); continue; }
+    if (s.phase === 'roundEnd') {
+      if (upgradeAfter(s.round)) { const p = choose(s.round); picks.push(p); s = nextRound(s, p); } else s = nextRound(s);
+      continue;
+    }
     const i = bot(s);
     inputs.push(i);
     s = step(s, i);
   }
-  return { state: s, inputs };
+  return { state: s, inputs, picks };
 }

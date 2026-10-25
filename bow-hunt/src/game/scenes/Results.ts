@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
-import { ARROW_LEFT_BONUS, ROUNDS, TARGETS_PER_ROUND } from '../../engine/constants';
+import { ARROW_LEFT_BONUS, BOWS, ROUNDS, TARGETS_PER_ROUND, TICK_HZ } from '../../engine/constants';
 import type { RoundSummary } from '../../engine/types';
 import { sfx } from '../audio/sfx';
 import { C, N, VIEW_H, VIEW_W } from '../config';
 import { formatScore } from '../session';
 import { button, tag, text } from '../ui/widgets';
 
-export type ResultsData = { summary: RoundSummary; score: number; upgrade?: string; onNext: () => void };
+/** choices: the two BOWS indices offered after this round, if any. onNext gets 0 (left bow) or 1 (right bow). */
+export type ResultsData = { summary: RoundSummary; score: number; choices?: number[]; onNext: (pick: number) => void };
 
 /** Round card: drops in on its twine, tallies the round, then Next round. */
 export class ResultsScene extends Phaser.Scene {
@@ -16,7 +17,7 @@ export class ResultsScene extends Phaser.Scene {
     const s = data.summary;
     this.add.rectangle(0, 0, VIEW_W, VIEW_H, N.plum, 0.55).setOrigin(0).setInteractive();
     const card = this.add.container(540, -700);
-    const w = 820, h = data.upgrade ? 1010 : 900;
+    const w = 860, h = data.choices ? 1240 : 900;
     card.add(tag(this, w, h, { twine: true }).setPosition(-w / 2, 0));
     card.add(text(this, 0, 70, `Round ${s.round + 1} cleared`, { size: 80, align: 'center' }).setOrigin(0.5, 0));
     card.add(text(this, 0, 168, `${ROUNDS - s.round - 1} to go`, { size: 44, font: 'hand', align: 'center' }).setOrigin(0.5, 0));
@@ -49,22 +50,48 @@ export class ResultsScene extends Phaser.Scene {
     });
 
     let done = false;
-    const next = () => {
+    const next = (pick: number) => {
       if (done) return;
       done = true;
-      this.tweens.add({ targets: card, y: -1000, duration: 260, ease: 'Back.easeIn', onComplete: () => { this.scene.stop(); data.onNext(); } });
+      this.tweens.add({ targets: card, y: -1400, duration: 260, ease: 'Back.easeIn', onComplete: () => { this.scene.stop(); data.onNext(pick); } });
     };
-    if (data.upgrade) {
-      const up = text(this, 0, h - 250, `New bow: ${data.upgrade}. Faster draw, flatter shots.`, { size: 40, font: 'hand', color: C.cranberry, align: 'center', wrap: w - 100 }).setOrigin(0.5).setAlpha(0).setScale(1.3);
-      card.add(up);
-      this.tweens.add({ targets: up, alpha: 1, scale: 1, delay: 1400, duration: 260, ease: 'Back.easeOut', onStart: () => sfx.multi(3) });
+    if (data.choices) {
+      card.add(text(this, 0, lineY + 130, 'Pick your next bow', { size: 54, align: 'center' }).setOrigin(0.5, 0));
+      data.choices.forEach((bowIndex, i) => card.add(this.bowTile(i === 0 ? -205 : 205, lineY + 420, bowIndex, () => next(i))));
+      this.input.keyboard?.once('keydown-LEFT', () => next(0));
+      this.input.keyboard?.once('keydown-ONE', () => next(0));
+      this.input.keyboard?.once('keydown-RIGHT', () => next(1));
+      this.input.keyboard?.once('keydown-TWO', () => next(1));
+    } else {
+      card.add(button(this, 0, h - 120, 520, 140, 'Next round', 'primary', () => next(0)));
+      this.input.keyboard?.once('keydown-SPACE', () => next(0));
+      this.input.keyboard?.once('keydown-ENTER', () => next(0));
     }
-    card.add(button(this, 0, h - 120, 520, 140, 'Next round', 'primary', next));
-    this.input.keyboard?.once('keydown-SPACE', next);
-    this.input.keyboard?.once('keydown-ENTER', next);
 
     card.setRotation(-0.08);
     this.tweens.add({ targets: card, y: 360, duration: 520, ease: 'Back.easeOut' });
     this.tweens.add({ targets: card, rotation: 0, duration: 1300, ease: 'Elastic.easeOut', easeParams: [1.1, 0.4] });
+  }
+
+  /** A tappable card for one bow: picture, name, what it's good at, and its numbers. */
+  private bowTile(x: number, y: number, bowIndex: number, onPick: () => void): Phaser.GameObjects.Container {
+    const b = BOWS[bowIndex];
+    const tw = 370, th = 400;
+    const c = this.add.container(x, y);
+    const g = this.add.graphics();
+    g.fillStyle(N.ink, 0.35); g.fillRoundedRect(-tw / 2 + 5, -th / 2 + 9, tw, th, 22);
+    g.fillStyle(N.paper, 1); g.fillRoundedRect(-tw / 2, -th / 2, tw, th, 22);
+    g.lineStyle(4, N.kraftDark, 1); g.strokeRoundedRect(-tw / 2, -th / 2, tw, th, 22);
+    c.add(g);
+    c.add(this.add.image(0, -100, `bow-${bowIndex}`).setRotation(-Math.PI / 2).setScale(0.55));
+    c.add(text(this, 0, -22, b.name, { size: 42, align: 'center' }).setOrigin(0.5, 0));
+    c.add(text(this, 0, 36, b.blurb, { size: 32, font: 'hand', align: 'center', wrap: tw - 40 }).setOrigin(0.5, 0));
+    c.add(text(this, 0, 128, `Full draw ${(b.drawMax / TICK_HZ).toFixed(2)} s\n${b.arrows} arrows a round`, { size: 30, font: 'hand', color: C.cranberry, align: 'center' }).setOrigin(0.5, 0));
+    c.setSize(tw, th);
+    c.setInteractive({ hitArea: new Phaser.Geom.Rectangle(0, 0, tw, th), hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true });
+    c.on('pointerdown', () => { sfx.unlock(); c.setScale(0.96); });
+    c.on('pointerout', () => c.setScale(1));
+    c.on('pointerup', () => { c.setScale(1); sfx.click(); onPick(); });
+    return c;
   }
 }

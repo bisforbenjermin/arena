@@ -33,8 +33,9 @@ describe('plan', () => {
       const p = generateRunPlan(`shape-${i}`);
       expect(p.rounds).toHaveLength(C.ROUNDS);
       for (const r of p.rounds) {
-        expect(r.targets).toHaveLength(C.TARGETS_PER_ROUND + 1);
+        expect(r.targets.filter((t) => t.species !== 'star' && t.species !== 'hummer')).toHaveLength(C.TARGETS_PER_ROUND);
         expect(r.targets.filter((t) => t.species === 'star')).toHaveLength(1);
+        expect(r.targets.filter((t) => t.species === 'hummer').length).toBeLessThanOrEqual(1);
         const golds = r.targets.filter((t) => t.species === 'golden').length;
         expect(golds).toBe(r.golden ? 1 : 0);
         for (const t of r.targets) {
@@ -50,6 +51,29 @@ describe('plan', () => {
     for (let i = 0; i < 400; i++) for (const r of generateRunPlan(`gold-${i}`).rounds) { rounds++; if (r.golden) golden++; }
     expect(golden / rounds).toBeGreaterThan(0.12);
     expect(golden / rounds).toBeLessThan(0.22);
+  });
+
+  it('sends a hummingbird about every other round, always high', () => {
+    let n = 0, rounds = 0;
+    for (let i = 0; i < 300; i++) for (const r of generateRunPlan(`hum-${i}`).rounds) {
+      rounds++;
+      for (const t of r.targets) if (t.species === 'hummer') { n++; expect(t.entryY).toBeLessThanOrEqual(240); }
+    }
+    expect(n / rounds).toBeGreaterThan(0.4);
+    expect(n / rounds).toBeLessThan(0.6);
+  });
+
+  it('flies some lines of 3 (rounds 2-3) or 4 (rounds 4-5), never in round 1', () => {
+    let lines = 0;
+    for (let i = 0; i < 200; i++) {
+      generateRunPlan(`line-${i}`).rounds.forEach((r, round) => {
+        const birds = r.targets.filter((t) => t.species !== 'star' && t.species !== 'hummer');
+        const run = birds.filter((t) => t.gap === C.FORMATION_GAP && t.jinks.length === 0 && t.amp === 8).length;
+        if (round === 0) expect(run).toBe(0);
+        if (run > 0) lines++;
+      });
+    }
+    expect(lines).toBeGreaterThan(200);
   });
 
   it('gets harder: later rounds are faster, more erratic and spawn sooner', () => {
@@ -86,12 +110,14 @@ describe('targets', () => {
 });
 
 describe('arrows', () => {
-  it('each bow upgrade draws faster and shoots harder', () => {
-    for (let t = 1; t < C.BOW_TIERS.length; t++) {
-      expect(C.BOW_TIERS[t].drawMax).toBeLessThan(C.BOW_TIERS[t - 1].drawMax);
-      expect(launchSpeed(C.BOW_TIERS[t].drawMax, t)).toBeGreaterThan(launchSpeed(C.BOW_TIERS[t - 1].drawMax, t - 1));
+  it('every upgrade bow shoots harder than the bow before it, and the two choices really differ', () => {
+    const full = (b: number) => launchSpeed(C.BOWS[b].drawMax, b);
+    for (const [round, [a, b]] of Object.entries(C.UPGRADES)) {
+      expect(full(a), `after round ${round}`).toBeGreaterThan(full(0));
+      expect(full(b)).toBeGreaterThan(full(0));
+      const A = C.BOWS[a], B = C.BOWS[b];
+      expect(A.drawMax !== B.drawMax || A.arrows !== B.arrows).toBe(true);
     }
-    expect(C.TIER_BY_ROUND).toHaveLength(C.ROUNDS);
   });
 
   it('launch speed scales with draw time and caps at full draw', () => {
@@ -129,7 +155,11 @@ describe('scoring', () => {
     expect([1, 2, 3, 9, 50].map(comboQuarters)).toEqual([4, 5, 6, 12, 12]);
   });
 
-  it('long shots pay +50%, extra targets on one arrow pay +200 each', () => {
+  it('double, triple and quad on one arrow pay +200, +600 and +1,500', () => {
+    expect([0, 1, 2, 3, 5].map((k) => hitPoints('goose', false, 1, k) - 75)).toEqual([0, 200, 600, 1500, 1500]);
+  });
+
+  it('long shots pay +50%, a second target on one arrow pays +200', () => {
     expect(hitPoints('duck', false, 1, 0)).toBe(150);
     expect(hitPoints('duck', true, 1, 0)).toBe(225);
     expect(hitPoints('duck', true, 3, 0)).toBe(337);
@@ -184,6 +214,9 @@ describe('sim', () => {
     const s: GameState = { ...createInitialState(plan), phase: 'roundEnd', arrowsLeft: 3, round: 1, roundHits: 7 };
     const n = nextRound(s);
     expect(n).toMatchObject({ phase: 'intro', round: 2, arrowsLeft: C.ARROWS_PER_ROUND, roundHits: 0, spawned: 0 });
+    const afterFirst: GameState = { ...s, round: 0 };
+    expect(nextRound(afterFirst, 0).bow).toBe(C.UPGRADES[0][0]);
+    expect(nextRound(afterFirst, 1)).toMatchObject({ bow: C.UPGRADES[0][1], arrowsLeft: C.BOWS[C.UPGRADES[0][1]].arrows });
     expect(step(s, idle)).toBe(s);
   });
 

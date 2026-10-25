@@ -47,8 +47,8 @@ export class GameOverScene extends Phaser.Scene {
       ['Birds', `${st.stats.hits}  (${acc}% of ${st.stats.shots} arrows)`],
       ['Best combo', `${st.stats.bestStreak} in a row`],
       ['Long shots', String(st.stats.longShots)],
-      ['Two or more on one arrow', String(st.stats.multiHits)],
-      ['Golden turkeys', String(st.stats.goldenHits)],
+      ['Multi-kills', `${st.stats.multiHits} (${st.stats.triples} triple, ${st.stats.quads} quad)`],
+      ['Golden and hummingbirds', `${st.stats.goldenHits} golden, ${st.stats.hummers} hummer`],
       ['Shooting stars', `${st.stats.stars} of 3`],
     ];
     rows.forEach(([k, v], i) => {

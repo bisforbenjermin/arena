@@ -1,6 +1,7 @@
 import { createRng, type Rng } from './rng';
 import {
   ROUNDS, TARGETS_PER_ROUND, SPAWN_GAP, JINKS, JINK_RANGE, SPECIES_WEIGHTS, GOLDEN_ONE_IN,
+  HUMMER_ONE_IN, FORMATION_ONE_IN, FORMATION_SIZE, FORMATION_GAP, FORMATION_STEP, SKY_TOP, SKY_BOTTOM,
 } from './constants';
 import { SPECIES, SPECIES_ORDER, type Species } from './species';
 import type { Jink, RoundPlan, RunPlan, TargetPlan } from './types';
@@ -46,9 +47,25 @@ export function generateRunPlan(seed: string): RunPlan {
       const species = i === goldenSlot ? 'golden' : pickSpecies(rng, r);
       targets.push(planTarget(rng, r, species));
     }
-    // one shooting star per round, somewhere in the middle of the flock; it doesn't count toward the quota
-    const starSlot = rng.int(2, TARGETS_PER_ROUND - 2);
-    targets.splice(starSlot, 0, planTarget(rng, r, 'star'));
+    // Some rounds send birds in a slanted line, so one arrow can take three or four. Possible, not easy.
+    if (FORMATION_SIZE[r] > 0 && rng.int(1, FORMATION_ONE_IN) === 1) {
+      const size = FORMATION_SIZE[r];
+      const first = rng.int(1, TARGETS_PER_ROUND - size);
+      const lead = planTarget(rng, r, rng.int(0, 1) === 0 ? 'goose' : 'duck');
+      const step = rng.int(FORMATION_STEP[0], FORMATION_STEP[1]) * (rng.int(0, 1) === 0 ? 1 : -1);
+      const top = Math.max(SKY_TOP + 20, Math.min(SKY_BOTTOM - 20 - (size - 1) * Math.abs(step), lead.entryY));
+      const y0 = step > 0 ? top : top + (size - 1) * -step;
+      for (let k = 0; k < size; k++) {
+        if (targets[first + k].species === 'golden') continue;
+        targets[first + k] = {
+          ...lead, path: 'glide', amp: 8, jinks: [], entryY: y0 + k * step,
+          gap: k === 0 ? targets[first].gap : FORMATION_GAP,
+        };
+      }
+    }
+    // one shooting star per round, and sometimes a hummingbird; neither counts toward the quota
+    targets.splice(rng.int(2, TARGETS_PER_ROUND - 2), 0, planTarget(rng, r, 'star'));
+    if (rng.int(1, HUMMER_ONE_IN) === 1) targets.splice(rng.int(3, targets.length - 1), 0, planTarget(rng, r, 'hummer'));
     rounds.push({ golden, targets });
   }
   return { seed, rounds };

@@ -1,7 +1,7 @@
 // Fixed-timestep driver for one run. No Phaser here, so it can be tested in Node.
 import { TICK_HZ } from '../engine/constants';
 import { generateRunPlan } from '../engine/plan';
-import { createInitialState, nextRound, step } from '../engine/sim';
+import { createInitialState, nextRound, step, upgradeAfter } from '../engine/sim';
 import { makeReplay, runReplay } from '../engine/replay';
 import type { GameEvent, GameState, Input, Mode, ReplayLog } from '../engine/types';
 
@@ -12,6 +12,7 @@ export class RunController {
   state: GameState;
   prev: GameState;
   readonly inputs: Input[] = [];
+  readonly picks: number[] = [];
   private acc = 0;
 
   constructor(readonly mode: Mode, readonly seed: string) {
@@ -46,14 +47,16 @@ export class RunController {
     return this.waiting ? 1 : Math.min(1, this.acc / STEP_MS);
   }
 
-  nextRound(): void {
-    this.state = nextRound(this.state);
+  /** `pick` chooses bow A (0) or B (1) when the round just cleared offers an upgrade; it is recorded for the replay. */
+  nextRound(pick = 0): void {
+    if (this.state.phase === 'roundEnd' && upgradeAfter(this.state.round)) this.picks.push(pick);
+    this.state = nextRound(this.state, pick);
     this.prev = this.state;
     this.acc = 0;
   }
 
   replay(): ReplayLog {
-    return makeReplay(this.mode, this.seed, this.inputs);
+    return makeReplay(this.mode, this.seed, this.inputs, this.picks);
   }
 
   /** Re-runs the whole hunt from the seed and recorded inputs, the same check the server will do. */
