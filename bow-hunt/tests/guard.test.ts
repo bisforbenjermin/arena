@@ -9,7 +9,7 @@ describe('determinism guard', () => {
   it('engine uses no nondeterministic or float-trig APIs', () => {
     for (const f of files) {
       const src = readFileSync(join(dir, f), 'utf8');
-      expect(src, f).not.toMatch(/Math\.(random|sin|cos|tan|atan2|sqrt|pow|hypot)\b|\bDate\b|\bperformance\b/);
+      expect(src, f).not.toMatch(/Math\.(random|sin|cos|tan|atan2|sqrt|pow|hypot|exp|log)\b|\bDate\b|\bperformance\b|[\w)\]]\s*\*\*/);
     }
   });
 

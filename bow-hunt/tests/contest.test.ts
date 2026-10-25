@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { dayEnd, dayKey, shiftDay } from '../src/contest/day';
-import { dailySeed } from '../src/server/seed';
 import { assignPrizes, rankEntries } from '../src/contest/rank';
 import { validateReplay } from '../src/contest/validate';
 import type { EntryRow } from '../src/contest/types';
@@ -23,11 +22,6 @@ describe('contest day math', () => {
     expect(shiftDay('2026-11-01', -1)).toBe('2026-10-31');
     expect(shiftDay('2026-12-31', 1)).toBe('2027-01-01');
     expect(shiftDay('2026-03-01', -1)).toBe('2026-02-28');
-  });
-
-  it('dailySeed is stable for a secret', () => {
-    expect(dailySeed('2026-11-01', 'test-secret')).toBe('bh-2026-11-01-61a7c1d2c3d74b11');
-    expect(dailySeed('2026-11-26', 'test-secret')).toBe('bh-2026-11-26-918187d205ea07ae');
   });
 });
 
@@ -60,11 +54,13 @@ describe('validateReplay', () => {
     expect(validateReplay(ok)).not.toBeNull();
   });
   it('rejects bad shapes', () => {
-    expect(validateReplay({ ...ok, inputs: [[0, 480, 100, 0]] })).toBeNull();
-    expect(validateReplay({ ...ok, inputs: [[1, 961, 100, 0]] })).toBeNull();
-    expect(validateReplay({ ...ok, inputs: [[1, 480, 100, 2]] })).toBeNull();
-    expect(validateReplay({ ...ok, version: 2 })).toBeNull();
-    expect(validateReplay({ ...ok, inputs: [[20000, 480, 100, 0], [1, 480, 100, 1]] })).toBeNull();
+    expect(validateReplay({ ...ok, inputs: [[0, 270, 100, 0]] })).toBeNull();
+    expect(validateReplay({ ...ok, inputs: [[1, 541, 100, 0]] })).toBeNull();
+    expect(validateReplay({ ...ok, inputs: [[1, 270, 961, 0]] })).toBeNull();
+    expect(validateReplay({ ...ok, inputs: [[1, 270, 100, 2]] })).toBeNull();
+    expect(validateReplay({ ...ok, version: 1 })).toBeNull();
+    expect(validateReplay({ ...ok, mode: 'ranked' })).toBeNull();
+    expect(validateReplay({ ...ok, inputs: [[25000, 270, 100, 0], [1, 270, 100, 1]] })).toBeNull();
     expect(validateReplay(null)).toBeNull();
     expect(validateReplay({ ...ok, seed: '' })).toBeNull();
   });

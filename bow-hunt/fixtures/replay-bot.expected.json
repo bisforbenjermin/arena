@@ -1,7 +1,8 @@
 {
-  "ticks": 4134,
-  "score": 13000,
-  "totalHits": 19,
-  "shotsFired": 43,
-  "outcome": "failed"
+  "ticks": 4325,
+  "score": 13408,
+  "hits": 48,
+  "shots": 71,
+  "roundsCleared": 5,
+  "outcome": "cleared"
 }

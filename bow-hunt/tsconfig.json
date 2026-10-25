@@ -4,7 +4,6 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "jsx": "react-jsx",
     "noEmit": true,
     "skipLibCheck": true,
     "lib": [
@@ -19,7 +18,6 @@
   "include": [
     "src",
     "tests",
-    "scripts",
-    "api"
+    "scripts"
   ]
 }

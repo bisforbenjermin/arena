@@ -1,111 +1,153 @@
 import {
-  WAVE_GAP_TICKS, TURKEYS_PER_WAVE, ARROWS_PER_WAVE, DRAW_MIN_TICKS, DRAW_MAX_TICKS,
-  HIT_POINTS, WAVES_PER_ROUND, PERFECT_ROUND_BONUS, ROUND_QUOTA, ROUNDS,
+  MILLI as M, ROUNDS, TARGETS_PER_ROUND, ARROWS_PER_ROUND, MAX_ON_SCREEN, ROUND_QUOTA, INTRO_TICKS,
+  FIRST_SPAWN_TICKS, DRAW_MIN_TICKS, DRAW_MAX_TICKS, PERFECT_ROUND_BONUS, ARROW_LEFT_BONUS,
 } from './constants';
-import { spawnTurkey, stepTurkey, escapeTurkey, hitTurkey } from './turkeys';
-import { fireArrow, stepArrow, arrowOut, arrowHitsTurkey } from './arrows';
-import type { Arrow, GameState, Input, RunPlan, Turkey } from './types';
+import { SPECIES } from './species';
+import { fireArrow, stepArrow, arrowOut, segmentHitsCircle } from './arrows';
+import { spawnTarget, stepTarget, fleeTarget, hitTarget, isHittable } from './targets';
+import { hitPoints, isLongShot } from './scoring';
+import type { Arrow, GameEvent, GameState, Input, RoundSummary, RunPlan, Target } from './types';
 
 export function createInitialState(plan: RunPlan): GameState {
   return {
-    tick: 0, phase: 'intermission', phaseTicks: 0, waveIndex: 0,
-    turkeys: [], arrows: [], arrowsLeft: 0, drawTicks: 0, wasDrawing: false,
-    score: 0, roundHits: 0, totalHits: 0, shotsFired: 0, outcome: 'none', plan,
+    tick: 0, phase: 'intro', phaseTicks: 0, round: 0, outcome: 'none',
+    targets: [], arrows: [], nextId: 0, spawned: 0, spawnTimer: FIRST_SPAWN_TICKS, outOfArrows: false,
+    arrowsLeft: ARROWS_PER_ROUND, drawTicks: 0, wasDrawing: false,
+    score: 0, roundHits: 0, roundPoints: 0, streak: 0,
+    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0 },
+    summaries: [], events: [], plan,
   };
 }
 
-export function currentRound(s: GameState): number {
-  return s.plan.waves[s.waveIndex].round;
+/** Starts the next round after a 'roundEnd'. The view calls it when the player taps Next Round. */
+export function nextRound(s: GameState): GameState {
+  if (s.phase !== 'roundEnd') return s;
+  return {
+    ...s, round: s.round + 1, phase: 'intro', phaseTicks: 0,
+    targets: [], arrows: [], spawned: 0, spawnTimer: FIRST_SPAWN_TICKS, outOfArrows: false,
+    arrowsLeft: ARROWS_PER_ROUND, drawTicks: 0, wasDrawing: false, roundHits: 0, roundPoints: 0, events: [],
+  };
 }
 
-/** Advances the game by exactly one fixed tick. Pure. */
+/** Advances the game by exactly one fixed tick. Pure: same state and input, same result. */
 export function step(s: GameState, input: Input): GameState {
-  if (s.phase === 'over') return s;
+  if (s.phase === 'over' || s.phase === 'roundEnd') return s;
   const tick = s.tick + 1;
-  const waveIndex = s.waveIndex;
-  const wave = s.plan.waves[waveIndex];
-  const round = wave.round;
+  const events: GameEvent[] = [];
 
-  if (s.phase === 'intermission') {
+  if (s.phase === 'intro') {
     const phaseTicks = s.phaseTicks + 1;
-    if (phaseTicks >= WAVE_GAP_TICKS) {
-      return {
-        ...s, tick, phase: 'playing', phaseTicks: 0,
-        turkeys: wave.turkeys.map((tp, i) => spawnTurkey(tp, round, waveIndex * TURKEYS_PER_WAVE + i)),
-        arrows: [], arrowsLeft: ARROWS_PER_WAVE, drawTicks: 0, wasDrawing: input.drawing,
-      };
+    if (phaseTicks >= INTRO_TICKS) {
+      events.push({ type: 'roundStart', round: s.round });
+      return { ...s, tick, phase: 'playing', phaseTicks: 0, drawTicks: 0, wasDrawing: input.drawing, events };
     }
-    return { ...s, tick, phaseTicks, wasDrawing: input.drawing };
+    return { ...s, tick, phaseTicks, wasDrawing: input.drawing, events };
   }
 
-  // a. Bow
-  let drawTicks = s.drawTicks;
-  let arrowsLeft = s.arrowsLeft;
-  let shotsFired = s.shotsFired;
+  const round = s.round;
+  const roundPlan = s.plan.rounds[round];
+  let { nextId, arrowsLeft, drawTicks, streak, score, roundHits, roundPoints, spawned, spawnTimer, outOfArrows } = s;
+  const stats = { ...s.stats };
+
+  // a. Bow: hold to draw, release to fire.
   let arrows: Arrow[] = s.arrows;
   if (input.drawing) {
     drawTicks = Math.min(drawTicks + 1, DRAW_MAX_TICKS);
   } else if (s.wasDrawing) {
     if (drawTicks >= DRAW_MIN_TICKS && arrowsLeft > 0) {
-      arrows = [...arrows, fireArrow(drawTicks, input.aimX, input.aimY, shotsFired)];
+      const a = fireArrow(drawTicks, input.aimX, input.aimY, nextId++);
+      arrows = [...arrows, a];
       arrowsLeft -= 1;
-      shotsFired += 1;
+      stats.shots += 1;
+      events.push({ type: 'fire', arrowId: a.id, power: drawTicks });
     }
     drawTicks = 0;
   }
-  const wasDrawing = input.drawing;
 
-  // b. Arrows
-  arrows = arrows.map(stepArrow).filter((a) => !arrowOut(a));
+  // b. Targets move.
+  const targets: Target[] = s.targets.map((t) => {
+    const n = stepTarget(t, roundPlan.targets[t.slot], round);
+    if (n.status === 'gone') {
+      if (t.status === 'falling') events.push({ type: 'landed', targetId: t.id, x: n.x });
+      else events.push({ type: 'escape', targetId: t.id });
+    }
+    return n;
+  });
 
-  // c. Turkeys
-  let turkeys: Turkey[] = s.turkeys.map((t, i) => stepTurkey(t, wave.turkeys[i], round));
-
-  // d. Out of arrows: remaining flyers escape
-  if (arrowsLeft === 0 && arrows.length === 0) {
-    turkeys = turkeys.map((t) => (t.status === 'flying' ? escapeTurkey(t) : t));
+  // c. Spawn the next target once its gap has passed and a slot is free.
+  if (!outOfArrows && spawned < TARGETS_PER_ROUND) {
+    spawnTimer -= 1;
+    const flying = targets.reduce((n, t) => n + (t.status === 'flying' ? 1 : 0), 0);
+    if (spawnTimer <= 0 && flying < MAX_ON_SCREEN) {
+      const t = spawnTarget(roundPlan.targets[spawned], round, nextId++, spawned);
+      targets.push(t);
+      events.push({ type: 'spawn', targetId: t.id, species: t.species });
+      spawned += 1;
+      spawnTimer = spawned < TARGETS_PER_ROUND ? roundPlan.targets[spawned].gap : 0;
+    }
   }
 
-  // e. Hits
-  let score = s.score, roundHits = s.roundHits, totalHits = s.totalHits;
+  // d. Arrows fly. Each arrow pierces, so it can take several targets.
   const kept: Arrow[] = [];
-  for (const a of arrows) {
-    let hit = false;
-    for (let i = 0; i < turkeys.length; i++) {
-      const t = turkeys[i];
-      if ((t.status === 'flying' || t.status === 'escaping') && arrowHitsTurkey(a, t)) {
-        turkeys = turkeys.map((x, j) => (j === i ? hitTurkey(x) : x));
-        roundHits += 1; totalHits += 1; score += HIT_POINTS[round];
-        hit = true;
-        break;
+  for (const a0 of arrows) {
+    let a = stepArrow(a0);
+    for (let i = 0; i < targets.length; i++) {
+      const t = targets[i];
+      if (!isHittable(t)) continue;
+      if (!segmentHitsCircle(a0.x, a0.y, a.x, a.y, t.x, t.y, SPECIES[t.species].radius * M)) continue;
+      if (a.hits === 0) {
+        streak += 1;
+        a = { ...a, streakAt: streak };
+        if (streak > stats.bestStreak) stats.bestStreak = streak;
       }
+      const long = isLongShot(t.x, t.y);
+      const points = hitPoints(t.species, long, a.streakAt, a.hits);
+      if (a.hits >= 1) stats.multiHits += 1;
+      a = { ...a, hits: a.hits + 1 };
+      targets[i] = hitTarget(t);
+      score += points; roundPoints += points; roundHits += 1;
+      stats.hits += 1;
+      if (long) stats.longShots += 1;
+      if (t.species === 'golden') stats.goldenHits += 1;
+      events.push({ type: 'hit', targetId: t.id, arrowId: a.id, species: t.species, x: t.x, y: t.y, points, long, multi: a.hits, streak: a.streakAt });
     }
-    if (!hit) kept.push(a);
+    if (arrowOut(a)) {
+      if (a.hits === 0) { streak = 0; events.push({ type: 'miss', arrowId: a.id }); }
+    } else {
+      kept.push(a);
+    }
   }
   arrows = kept;
 
+  // e. Quiver empty and nothing in the air: the rest of the flock flees and no more come.
+  let live = targets;
+  if (arrowsLeft === 0 && arrows.length === 0 && !outOfArrows) {
+    outOfArrows = true;
+    events.push({ type: 'outOfArrows' });
+    live = live.map((t) => (t.status === 'flying' ? fleeTarget(t) : t));
+  }
+  live = live.filter((t) => t.status !== 'gone');
+
   const next: GameState = {
-    ...s, tick, turkeys, arrows, arrowsLeft, shotsFired, drawTicks, wasDrawing, score, roundHits, totalHits,
+    ...s, tick, targets: live, arrows, nextId, spawned, spawnTimer, outOfArrows,
+    arrowsLeft, drawTicks, wasDrawing: input.drawing, score, roundHits, roundPoints, streak, stats, events,
   };
 
-  // f. Wave end
-  if (turkeys.every((t) => t.status === 'gone')) {
-    let endScore = score;
-    let endRoundHits = roundHits;
-    if (waveIndex % WAVES_PER_ROUND === WAVES_PER_ROUND - 1) {
-      if (roundHits === WAVES_PER_ROUND * TURKEYS_PER_WAVE) endScore += PERFECT_ROUND_BONUS;
-      if (roundHits < ROUND_QUOTA[round]) {
-        return { ...next, score: endScore, arrows: [], drawTicks: 0, phase: 'over', outcome: 'failed' };
-      }
-      if (round === ROUNDS - 1) {
-        return { ...next, score: endScore, arrows: [], drawTicks: 0, phase: 'over', outcome: 'cleared' };
-      }
-      endRoundHits = 0;
-    }
-    return {
-      ...next, score: endScore, roundHits: endRoundHits, arrows: [], drawTicks: 0,
-      waveIndex: waveIndex + 1, phase: 'intermission', phaseTicks: 0,
-    };
+  // f. Round over: nothing left to come and nothing left in the sky.
+  const pending = !outOfArrows && spawned < TARGETS_PER_ROUND;
+  if (pending || live.length > 0) return next;
+
+  for (const a of arrows) {
+    if (a.hits === 0) { next.streak = 0; events.push({ type: 'miss', arrowId: a.id }); }
   }
-  return next;
+  const quota = ROUND_QUOTA[round];
+  const passed = roundHits >= quota;
+  const arrowBonus = passed ? arrowsLeft * ARROW_LEFT_BONUS : 0;
+  const perfectBonus = roundHits === TARGETS_PER_ROUND ? PERFECT_ROUND_BONUS : 0;
+  const summary: RoundSummary = { round, hits: roundHits, quota, arrowsLeft, hitPoints: roundPoints, arrowBonus, perfectBonus, passed };
+  events.push({ type: 'roundEnd', summary });
+  const base = { ...next, arrows: [], drawTicks: 0, score: score + arrowBonus + perfectBonus, summaries: [...s.summaries, summary] };
+  if (!passed) return { ...base, phase: 'over', outcome: 'failed' };
+  if (round === ROUNDS - 1) return { ...base, phase: 'over', outcome: 'cleared' };
+  return { ...base, phase: 'roundEnd' };
 }
