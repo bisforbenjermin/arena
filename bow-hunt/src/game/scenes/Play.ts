@@ -112,7 +112,11 @@ export class PlayScene extends Phaser.Scene {
     this.steerWithKeys(delta);
     this.drawing = this.pointerDrawing || this.spaceDrawing;
     const events = this.run.advance(delta, { aimX: this.aim.aimX, aimY: this.aim.aimY, drawing: this.drawing });
-    for (const e of events) this.onEvent(e);
+    // Effects and sound are cosmetic: if one ever throws, log it and keep the hunt running.
+    // An uncaught error here would stop Phaser's frame loop and freeze the game.
+    for (const e of events) {
+      try { this.onEvent(e); } catch (err) { console.error('Bow Hunt: effect failed for', e.type, err); }
+    }
     if (events.length) this.hud.setStreak(this.run.state.streak);
     this.renderState();
     if (this.run.waiting && !this.ending) this.endOfRound();

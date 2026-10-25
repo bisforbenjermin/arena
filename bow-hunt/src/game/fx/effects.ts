@@ -31,7 +31,7 @@ export class Effects {
 
   burst(x: number, y: number, species: Species): void {
     const n = species === 'golden' ? 30 : species === 'goose' ? 20 : 16;
-    this.feathers.get(species)!.explode(n, x, y);
+    this.feathers.get(species)?.explode(n, x, y);
     if (species === 'golden') this.sparkles.explode(22, x, y);
   }
 

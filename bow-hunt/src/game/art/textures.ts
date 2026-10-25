@@ -4,7 +4,8 @@ import { birdFrames } from './birds';
 import { drawBackdrop, drawCloud, drawForeground } from './scenery';
 import { drawArrow, drawBow, drawGlow, drawStar, drawQuiverPickup, drawFirePickup, drawPuff, drawQuiverArrow, drawSheet, drawSparkle, paintFeather, paintLeaf, paintPip, SHEET_CELL } from './props';
 
-export const SPECIES_LIST: Species[] = ['duck', 'goose', 'turkey', 'golden', 'star', 'hummer'];
+// Every target the engine can spawn. Anything keyed by species (feather colors, emitters) must cover all of these.
+export const SPECIES_LIST: Species[] = ['duck', 'goose', 'turkey', 'golden', 'star', 'hummer', 'quiver', 'fire'];
 export const BIRDS: Species[] = ['duck', 'goose', 'turkey', 'golden'];
 
 export const FEATHER_COLORS: Record<Species, string[]> = {
