@@ -13,6 +13,8 @@
     "dev:phone": "vite --host"
   },
   "dependencies": {
+    "@fontsource/alfa-slab-one": "^5.3.0",
+    "@fontsource/patrick-hand": "^5.3.0",
     "phaser": "^3.90.0"
   },
   "devDependencies": {

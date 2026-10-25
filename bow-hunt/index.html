@@ -3,15 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#1b1f2a" />
+    <meta name="theme-color" content="#231931" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <title>Bow Hunt</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #10131a; overflow: hidden; overscroll-behavior: none; }
-      #game { width: 100vw; height: 100dvh; touch-action: none; -webkit-user-select: none; user-select: none; }
+      /* Tall phones letterbox the 9:16 game; the bars take the sky's top color and the grass's bottom color so they read as more sky and more field. */
+      :root { --sky: #231931; --field: #45501f; --ink: #f7ecd8; }
+      html, body { margin: 0; height: 100%; background: linear-gradient(var(--sky) 50%, var(--field) 50%); overflow: hidden; overscroll-behavior: none; }
+      body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+      #game { position: fixed; inset: 0; touch-action: none; }
+      #loading { position: fixed; inset: 0; display: grid; place-items: center; color: var(--ink); background: var(--sky); font: 28px/1.2 Georgia, serif; }
     </style>
   </head>
   <body>
     <div id="game"></div>
+    <div id="loading">Loading the flock…</div>
     <script type="module" src="/src/game/main.ts"></script>
   </body>
 </html>
