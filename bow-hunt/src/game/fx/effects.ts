@@ -39,6 +39,11 @@ export class Effects {
     this.sparkles.explode(1, x, y);
   }
 
+  /** Spark trailing a fire arrow. */
+  ember(x: number, y: number): void {
+    this.sparkles.explode(1, x, y);
+  }
+
   puff(x: number, y: number): void {
     this.puffs.explode(6, x, y);
   }

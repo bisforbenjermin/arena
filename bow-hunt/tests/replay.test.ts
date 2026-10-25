@@ -108,4 +108,4 @@ describe('golden scores', () => {
   });
 });
 
-const PINNED: number[] = [23347, 20925, 25480];
+const PINNED: number[] = [23405, 15619, 18237];

@@ -39,7 +39,7 @@ export class BowView {
   }
 
   /** `draw` is the engine's draw ticks; `armed` is false when the quiver is empty. */
-  update(aim: Aim, draw: number, armed: boolean, drawing: boolean): void {
+  update(aim: Aim, draw: number, armed: boolean, drawing: boolean, fire = false): void {
     // ease toward the aim so the bow doesn't jitter under a thumb
     this.angle += (aim.angle - this.angle) * 0.6;
     this.root.setRotation(this.angle - Math.PI / 2);
@@ -54,7 +54,7 @@ export class BowView {
     this.string.lineTo(nockX, 0);
     this.string.lineTo(BOW_TIP.x, BOW_TIP.y);
     this.string.strokePath();
-    this.nocked.setVisible(armed).setX(REST_TIP - pull);
+    this.nocked.setVisible(armed).setX(REST_TIP - pull).setTexture(fire ? 'arrow-fire' : 'arrow');
 
     this.ring.clear();
     if (drawing && armed && draw > 0) {

@@ -15,7 +15,7 @@ export type Target = {
   vx: number; vy: number; age: number; jinkIndex: number;
   status: TargetStatus; hit: boolean;
 };
-export type Arrow = { id: number; x: number; y: number; vx: number; vy: number; hits: number; streakAt: number };
+export type Arrow = { id: number; x: number; y: number; vx: number; vy: number; hits: number; streakAt: number; fire: boolean };
 
 export type Input = { aimX: number; aimY: number; drawing: boolean };
 export type Phase = 'intro' | 'playing' | 'roundEnd' | 'over';
@@ -31,6 +31,7 @@ export type GameEvent =
   | { type: 'outOfArrows' }
   | { type: 'landed'; targetId: number; x: number }
   | { type: 'starBonus'; points: number }
+  | { type: 'powerUp'; kind: 'quiver' | 'fire'; x: number; y: number }
   | { type: 'roundEnd'; summary: RoundSummary };
 
 export type RoundSummary = {
@@ -38,13 +39,13 @@ export type RoundSummary = {
   hitPoints: number; arrowBonus: number; perfectBonus: number; passed: boolean;
 };
 
-export type Stats = { shots: number; hits: number; longShots: number; multiHits: number; goldenHits: number; bestStreak: number; stars: number; hummers: number; triples: number; quads: number };
+export type Stats = { shots: number; hits: number; longShots: number; multiHits: number; goldenHits: number; bestStreak: number; stars: number; hummers: number; triples: number; quads: number; powerUps: number };
 
 export type GameState = {
   tick: number; phase: Phase; phaseTicks: number; round: number; outcome: Outcome;
   targets: Target[]; arrows: Arrow[]; nextId: number;
   spawned: number; spawnTimer: number; outOfArrows: boolean;
-  arrowsLeft: number; drawTicks: number; wasDrawing: boolean; bow: number;
+  arrowsLeft: number; drawTicks: number; wasDrawing: boolean; bow: number; fireShots: number;
   score: number; roundHits: number; roundPoints: number; streak: number;
   stats: Stats; summaries: RoundSummary[]; events: GameEvent[];
   plan: RunPlan;

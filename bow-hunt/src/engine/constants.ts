@@ -13,7 +13,7 @@ export const ROUND_QUOTA = [5, 6, 6, 7, 8];
 export const INTRO_TICKS = 90, FIRST_SPAWN_TICKS = 20;
 
 // Difficulty by round
-export const ROUND_SPEED = [1600, 1850, 2150, 2450, 2800];          // milli-units per tick, before species %
+export const ROUND_SPEED = [1750, 2050, 2350, 2700, 3100];          // milli-units per tick, before species %
 export const SPAWN_GAP: readonly (readonly [number, number])[] = [[70, 130], [60, 115], [50, 100], [40, 85], [30, 70]];
 export const JINKS = [0, 1, 2, 3, 4];                                // sudden height changes per target
 export const JINK_RANGE = [0, 60, 90, 120, 150];                    // units
@@ -37,10 +37,10 @@ export type Bow = { name: string; drawMax: number; maxSpeed: number; arrows: num
 /** Every bow in the game. The player starts with 0 and picks A or B at each upgrade. */
 export const BOWS: readonly Bow[] = [
   { name: 'Hunting bow',  drawMax: 40, maxSpeed: 32, arrows: 15, multiPct: 100, blurb: 'Your starting bow.' },
-  { name: 'Recurve bow',  drawMax: 26, maxSpeed: 39, arrows: 17, multiPct: 100, blurb: 'Quick draw, 17 arrows.' },
-  { name: 'Longbow',      drawMax: 44, maxSpeed: 39, arrows: 14, multiPct: 200, blurb: 'Slow draw, 14 arrows, double multi-kill bonus.' },
-  { name: 'Compound bow', drawMax: 20, maxSpeed: 42, arrows: 17, multiPct: 100, blurb: 'Fastest draw, 17 arrows.' },
-  { name: 'Crossbow',     drawMax: 40, maxSpeed: 46, arrows: 11, multiPct: 100, blurb: 'Dead-flat bolts, only 11.' },
+  { name: 'Recurve bow',  drawMax: 26, maxSpeed: 39, arrows: 17, multiPct: 100, blurb: 'Quick draw.' },
+  { name: 'Longbow',      drawMax: 44, maxSpeed: 39, arrows: 14, multiPct: 200, blurb: 'Slow draw. Double multi-kill bonus.' },
+  { name: 'Compound bow', drawMax: 20, maxSpeed: 42, arrows: 17, multiPct: 100, blurb: 'Fastest draw.' },
+  { name: 'Crossbow',     drawMax: 40, maxSpeed: 46, arrows: 11, multiPct: 100, blurb: 'Flattest shots, fewer bolts.' },
 ];
 /** After clearing these rounds (0-based) the player chooses one of two bows. */
 export const UPGRADES: Readonly<Record<number, readonly [number, number]>> = { 0: [1, 2], 2: [3, 4] };
@@ -54,6 +54,10 @@ export const MULTI_BONUS = [0, 200, 600, 1500];                    // for the 2n
 export const COMBO_STEP_QUARTERS = 1, COMBO_MAX_STEPS = 8;          // +25% per streak step, up to ×3
 export const PERFECT_ROUND_BONUS = 1000, ARROW_LEFT_BONUS = 25;
 export const STARS_FOR_BONUS = 3, STAR_BONUS = 3000;                // one shooting star crosses each round
+
+// Power-ups: one floats across each round. Shoot it to collect.
+export const QUIVER_ARROWS = 3;                                     // arrow bundle: +3 arrows this round
+export const FIRE_SHOTS = 5, FIRE_RADIUS_PCT = 160;                 // fire arrows: next 5 arrows hit in a 60% wider circle
 
 export const MAX_RUN_TICKS = 25000;
 export const DEFAULT_SEED = 'gobble-2026';

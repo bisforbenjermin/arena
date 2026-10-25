@@ -66,6 +66,8 @@ export function generateRunPlan(seed: string): RunPlan {
     // one shooting star per round, and sometimes a hummingbird; neither counts toward the quota
     targets.splice(rng.int(2, TARGETS_PER_ROUND - 2), 0, planTarget(rng, r, 'star'));
     if (rng.int(1, HUMMER_ONE_IN) === 1) targets.splice(rng.int(3, targets.length - 1), 0, planTarget(rng, r, 'hummer'));
+    // one power-up per round: an arrow bundle or fire arrows
+    targets.splice(rng.int(1, 6), 0, planTarget(rng, r, rng.int(0, 1) === 0 ? 'quiver' : 'fire'));
     rounds.push({ golden, targets });
   }
   return { seed, rounds };

@@ -29,7 +29,7 @@ export function fireArrow(drawTicks: number, aimX: number, aimY: number, id: num
   return {
     id, x: BOW_X * M, y: BOW_Y * M,
     vx: Math.trunc(dx * speed / len), vy: Math.trunc(dy * speed / len),
-    hits: 0, streakAt: 0,
+    hits: 0, streakAt: 0, fire: false,
   };
 }
 

@@ -2,6 +2,7 @@
 import { MILLI as M, BOW_X, BOW_Y, WORLD_W, WORLD_H, ARROW_GRAVITY, BOWS } from '../engine/constants';
 import { launchSpeed } from '../engine/arrows';
 import { stepTarget, isHittable } from '../engine/targets';
+import { isBonus } from '../engine/species';
 import { generateRunPlan } from '../engine/plan';
 import { createInitialState, nextRound, step, upgradeAfter } from '../engine/sim';
 import type { GameState, Input, Target } from '../engine/types';
@@ -16,7 +17,7 @@ const clampAim = (x: number, y: number): Input => ({
 });
 
 function firstTarget(s: GameState): Target | undefined {
-  return s.targets.find((t) => t.status === 'flying' && t.species !== 'star' && t.species !== 'hummer') ?? s.targets.find((t) => t.status === 'flying');
+  return s.targets.find((t) => t.status === 'flying' && !isBonus(t.species)) ?? s.targets.find((t) => t.status === 'flying');
 }
 
 /** Aims where the target will be when a full-power arrow can get there. */

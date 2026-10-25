@@ -1,7 +1,7 @@
 import {
   MILLI as M, ROUNDS, TARGETS_PER_ROUND, MAX_ON_SCREEN, ROUND_QUOTA, INTRO_TICKS,
   FIRST_SPAWN_TICKS, DRAW_MIN_TICKS, PERFECT_ROUND_BONUS, ARROW_LEFT_BONUS, BOWS, UPGRADES,
-  STARS_FOR_BONUS, STAR_BONUS,
+  STARS_FOR_BONUS, STAR_BONUS, QUIVER_ARROWS, FIRE_SHOTS, FIRE_RADIUS_PCT,
 } from './constants';
 import { SPECIES, isBonus } from './species';
 import { fireArrow, stepArrow, arrowOut, segmentHitsCircle } from './arrows';
@@ -18,9 +18,9 @@ export function createInitialState(plan: RunPlan): GameState {
   return {
     tick: 0, phase: 'intro', phaseTicks: 0, round: 0, outcome: 'none',
     targets: [], arrows: [], nextId: 0, spawned: 0, spawnTimer: FIRST_SPAWN_TICKS, outOfArrows: false,
-    arrowsLeft: BOWS[0].arrows, drawTicks: 0, wasDrawing: false, bow: 0,
+    arrowsLeft: BOWS[0].arrows, drawTicks: 0, wasDrawing: false, bow: 0, fireShots: 0,
     score: 0, roundHits: 0, roundPoints: 0, streak: 0,
-    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0, stars: 0, hummers: 0, triples: 0, quads: 0 },
+    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0, stars: 0, hummers: 0, triples: 0, quads: 0, powerUps: 0 },
     summaries: [], events: [], plan,
   };
 }
@@ -59,7 +59,7 @@ export function step(s: GameState, input: Input): GameState {
   const roundPlan = s.plan.rounds[round];
   const bow = s.bow;
   const total = roundPlan.targets.length;
-  let { nextId, arrowsLeft, drawTicks, streak, score, roundHits, roundPoints, spawned, spawnTimer, outOfArrows } = s;
+  let { nextId, arrowsLeft, drawTicks, streak, score, roundHits, roundPoints, spawned, spawnTimer, outOfArrows, fireShots } = s;
   const stats = { ...s.stats };
 
   // a. Bow: hold to draw, release to fire.
@@ -68,7 +68,8 @@ export function step(s: GameState, input: Input): GameState {
     drawTicks = Math.min(drawTicks + 1, BOWS[bow].drawMax);
   } else if (s.wasDrawing) {
     if (drawTicks >= DRAW_MIN_TICKS && arrowsLeft > 0) {
-      const a = fireArrow(drawTicks, input.aimX, input.aimY, nextId++, bow);
+      const a = { ...fireArrow(drawTicks, input.aimX, input.aimY, nextId++, bow), fire: fireShots > 0 };
+      if (fireShots > 0) fireShots -= 1;
       arrows = [...arrows, a];
       arrowsLeft -= 1;
       stats.shots += 1;
@@ -107,7 +108,8 @@ export function step(s: GameState, input: Input): GameState {
     for (let i = 0; i < targets.length; i++) {
       const t = targets[i];
       if (!isHittable(t)) continue;
-      if (!segmentHitsCircle(a0.x, a0.y, a.x, a.y, t.x, t.y, SPECIES[t.species].radius * M)) continue;
+      const radius = Math.trunc(SPECIES[t.species].radius * M * (a.fire ? FIRE_RADIUS_PCT : 100) / 100);
+      if (!segmentHitsCircle(a0.x, a0.y, a.x, a.y, t.x, t.y, radius)) continue;
       if (a.hits === 0) {
         streak += 1;
         a = { ...a, streakAt: streak };
@@ -126,6 +128,12 @@ export function step(s: GameState, input: Input): GameState {
       if (long) stats.longShots += 1;
       if (t.species === 'golden') stats.goldenHits += 1;
       events.push({ type: 'hit', targetId: t.id, arrowId: a.id, species: t.species, x: t.x, y: t.y, points, long, multi: a.hits, streak: a.streakAt });
+      if (t.species === 'quiver' || t.species === 'fire') {
+        stats.powerUps += 1;
+        if (t.species === 'quiver') arrowsLeft += QUIVER_ARROWS;
+        else fireShots += FIRE_SHOTS;
+        events.push({ type: 'powerUp', kind: t.species, x: t.x, y: t.y });
+      }
       if (t.species === 'star') {
         stats.stars += 1;
         if (stats.stars === STARS_FOR_BONUS) {
@@ -153,7 +161,7 @@ export function step(s: GameState, input: Input): GameState {
 
   const next: GameState = {
     ...s, tick, targets: live, arrows, nextId, spawned, spawnTimer, outOfArrows,
-    arrowsLeft, drawTicks, wasDrawing: input.drawing, score, roundHits, roundPoints, streak, stats, events,
+    arrowsLeft, drawTicks, fireShots, wasDrawing: input.drawing, score, roundHits, roundPoints, streak, stats, events,
   };
 
   // f. Round over: nothing left to come and nothing left in the sky.

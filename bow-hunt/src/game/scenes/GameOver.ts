@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { GameState, Mode } from '../../engine/types';
 import { C, N, VIEW_H, VIEW_W } from '../config';
 import { formatScore, getBest, practiceSeed, recordBest } from '../session';
-import { button, tag, text } from '../ui/widgets';
+import { button, fit, tag, text } from '../ui/widgets';
 
 export type GameOverData = { mode: Mode; seed: string; state: GameState; verified: boolean };
 
@@ -17,21 +17,21 @@ export class GameOverScene extends Phaser.Scene {
     const last = st.summaries[st.summaries.length - 1];
 
     this.add.rectangle(0, 0, VIEW_W, VIEW_H, N.plum, 0.62).setOrigin(0).setInteractive();
-    const w = 860, h = 1430;
+    const w = 860, h = 1470;
     const card = this.add.container(540, -1400);
     card.add(tag(this, w, h, { twine: true }).setPosition(-w / 2, 0));
-    card.add(text(this, 0, 70, cleared ? 'Hunt complete' : 'The flock got away', { size: cleared ? 84 : 70, align: 'center' }).setOrigin(0.5, 0));
+    card.add(fit(text(this, 0, 64, cleared ? 'Hunt complete' : 'The flock got away', { size: 80, align: 'center' }).setOrigin(0.5, 0), w - 120));
     const sub = cleared
       ? 'All five rounds cleared.'
       : `Round ${last.round + 1}: ${last.hits} of 10, needed ${last.quota}.`;
-    card.add(text(this, 0, 172, sub, { size: 46, font: 'hand', align: 'center' }).setOrigin(0.5, 0));
+    card.add(fit(text(this, 0, 166, sub, { size: 46, font: 'hand', align: 'center' }).setOrigin(0.5, 0), w - 120));
 
-    const score = text(this, 0, 250, '0', { size: 150, color: C.cranberry, align: 'center' }).setOrigin(0.5, 0);
+    const score = text(this, 0, 244, '0', { size: 140, color: C.cranberry, align: 'center' }).setOrigin(0.5, 0);
     card.add(score);
-    this.tweens.addCounter({ from: 0, to: st.score, delay: 450, duration: 900, ease: 'Cubic.easeOut', onUpdate: (tw) => score.setText(formatScore(tw.getValue() ?? st.score)) });
+    this.tweens.addCounter({ from: 0, to: st.score, delay: 450, duration: 900, ease: 'Cubic.easeOut', onUpdate: (tw) => fit(score.setText(formatScore(tw.getValue() ?? st.score)), w - 140) });
 
     if (isBest) {
-      const stamp = this.add.container(0, 470).setRotation(-0.06).setAlpha(0).setScale(2);
+      const stamp = this.add.container(0, 486).setRotation(-0.06).setAlpha(0).setScale(2);
       const g = this.add.graphics();
       g.lineStyle(7, N.cranberry, 1); g.strokeRoundedRect(-150, -46, 300, 92, 14);
       stamp.add([g, text(this, 0, 0, 'New best', { size: 48, color: C.cranberry, align: 'center' }).setOrigin(0.5)]);
@@ -48,16 +48,18 @@ export class GameOverScene extends Phaser.Scene {
       ['Best combo', `${st.stats.bestStreak} in a row`],
       ['Long shots', String(st.stats.longShots)],
       ['Multi-kills', `${st.stats.multiHits} (${st.stats.triples} triple, ${st.stats.quads} quad)`],
-      ['Golden and hummingbirds', `${st.stats.goldenHits} golden, ${st.stats.hummers} hummer`],
-      ['Shooting stars', `${st.stats.stars} of 3`],
+      ['Golden turkeys', String(st.stats.goldenHits)],
+      ['Hummingbirds', String(st.stats.hummers)],
+      ['Shooting stars', st.stats.stars >= 3 ? `${st.stats.stars}, bonus won` : `${st.stats.stars} of 3`],
     ];
     rows.forEach(([k, v], i) => {
-      const y = 556 + i * 62;
-      card.add(text(this, -w / 2 + 70, y, k, { size: 44, font: 'hand' }));
-      card.add(text(this, w / 2 - 70, y, v, { size: 40, align: 'right' }).setOrigin(1, 0));
+      const y = 560 + i * 58;
+      const left = text(this, -w / 2 + 70, y, k, { size: 42, font: 'hand' });
+      card.add(left);
+      card.add(fit(text(this, w / 2 - 70, y, v, { size: 38, align: 'right' }).setOrigin(1, 0), w - 160 - left.width - 24));
     });
-    const check = data.verified ? 'Checked: a replay of your shots scores the same.' : 'Check failed: the replay disagrees, so this run won\'t count.';
-    card.add(text(this, 0, 556 + rows.length * 62 + 18, check, { size: 34, font: 'hand', color: data.verified ? '#3E5A1E' : C.cranberry, align: 'center', wrap: w - 100 }).setOrigin(0.5, 0));
+    const check = data.verified ? 'Checked: replaying your shots gives this score.' : 'Check failed: the replay disagrees, so this run won\'t count.';
+    card.add(text(this, 0, 560 + rows.length * 58 + 14, check, { size: 38, font: 'hand', color: data.verified ? '#3E5A1E' : C.cranberry, align: 'center', wrap: w - 100 }).setOrigin(0.5, 0));
 
     const again = () => {
       this.scene.stop();
@@ -69,7 +71,7 @@ export class GameOverScene extends Phaser.Scene {
     card.add(button(this, 0, h - 90, 560, 116, 'Menu', 'kraft', menu));
 
     card.setRotation(0.07);
-    this.tweens.add({ targets: card, y: 170, duration: 600, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: card, y: 150, duration: 600, ease: 'Back.easeOut' });
     this.tweens.add({ targets: card, rotation: 0, duration: 1400, ease: 'Elastic.easeOut', easeParams: [1.1, 0.4] });
   }
 }

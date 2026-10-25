@@ -5,7 +5,7 @@ import type { Mode } from '../../engine/types';
 import { C, DEPTH, N } from '../config';
 import { PIP_FRAMES } from '../art/textures';
 import { formatDay, formatScore } from '../session';
-import { tag, text } from './widgets';
+import { fit, tag, text } from './widgets';
 
 type Pip = { img: Phaser.GameObjects.Image; state: 'pending' | 'hit' | 'gold' | 'missed' };
 
@@ -23,6 +23,7 @@ export class Hud {
   private banner?: Phaser.GameObjects.Container;
   private stars: Phaser.GameObjects.Image[] = [];
   private bowText: Phaser.GameObjects.Text;
+  private fireText: Phaser.GameObjects.Text;
 
   constructor(private scene: Phaser.Scene, mode: Mode) {
     const d = DEPTH.hud;
@@ -37,7 +38,7 @@ export class Hud {
     roundTag.add(tag(scene, 360, 158, { twine: true }));
     this.roundText = text(scene, 180, 50, 'Round 1 of 5', { size: 40, align: 'center' }).setOrigin(0.5, 0);
     roundTag.add(this.roundText);
-    roundTag.add(text(scene, 180, 104, mode === 'daily' ? `Daily hunt, ${formatDay()}` : 'Practice', { size: 34, font: 'hand', align: 'center' }).setOrigin(0.5, 0));
+    roundTag.add(fit(text(scene, 180, 100, mode === 'daily' ? `Daily hunt, ${formatDay()}` : 'Practice', { size: 40, font: 'hand', align: 'center' }).setOrigin(0.5, 0), 320));
     roundTag.setRotation(0.02);
 
     // tally of the round's ten birds
@@ -52,7 +53,7 @@ export class Hud {
     flag.fillRect(-2, -34, 4, 64);
     flag.fillTriangle(2, -34, 26, -26, 2, -18);
     this.quotaMark.add(flag);
-    this.quotaMark.add(text(scene, 0, 40, '', { size: 30, font: 'hand', color: C.paper, stroke: 5, align: 'center' }).setOrigin(0.5, 0));
+    this.quotaMark.add(text(scene, 0, 36, '', { size: 40, font: 'hand', color: C.paper, stroke: 6, align: 'center' }).setOrigin(0.5, 0));
 
     // quiver, bottom left
     const most = Math.max(...BOWS.map((b) => b.arrows));
@@ -61,7 +62,8 @@ export class Hud {
     }
     this.quiverText = text(scene, 56 + most * 14 + 16, 1790, '15', { size: 58, color: C.paper, stroke: 8 }).setDepth(d);
 
-    this.bowText = text(scene, 50, 1716, '', { size: 34, font: 'hand', color: C.paper, stroke: 5 }).setDepth(d);
+    this.bowText = text(scene, 50, 1716, '', { size: 40, font: 'hand', color: C.paper, stroke: 6 }).setDepth(d);
+    this.fireText = text(scene, 50, 1662, '', { size: 40, font: 'hand', color: C.gold, stroke: 6 }).setDepth(d);
 
     // three stars for the star bonus, under the sound and pause buttons
     for (let i = 0; i < STARS_FOR_BONUS; i++) {
@@ -90,9 +92,9 @@ export class Hud {
     const from = this.shownScore;
     this.scoreTween = this.scene.tweens.addCounter({
       from, to: score, duration: 380, ease: 'Cubic.easeOut',
-      onUpdate: (tw) => { this.shownScore = tw.getValue() ?? score; this.scoreText.setText(formatScore(this.shownScore)); },
+      onUpdate: (tw) => { this.shownScore = tw.getValue() ?? score; fit(this.scoreText.setText(formatScore(this.shownScore)), 300); },
     });
-    this.scene.tweens.add({ targets: this.scoreText, scale: 1.12, duration: 90, yoyo: true });
+    
   }
 
   markHit(golden: boolean): void {
@@ -124,6 +126,10 @@ export class Hud {
     });
   }
 
+  setFire(shots: number): void {
+    this.fireText.setText(shots > 0 ? `Fire arrows: ${shots}` : '');
+  }
+
   setBow(name: string): void {
     this.bowText.setText(name);
   }
@@ -138,7 +144,7 @@ export class Hud {
     if (streak < 2) { this.combo.setVisible(false); return; }
     const q = comboQuarters(streak);
     const mult = (q / 4).toFixed(2).replace(/0$/, '').replace(/\.0$/, '');
-    this.comboText.setText(`Combo ×${mult}`);
+    fit(this.comboText.setText(`Combo ×${mult}`), 230);
     this.combo.setVisible(true).setScale(0.7);
     this.scene.tweens.add({ targets: this.combo, scale: 1, duration: 220, ease: 'Back.easeOut' });
   }
@@ -148,7 +154,7 @@ export class Hud {
     this.banner?.destroy();
     const c = this.scene.add.container(540, 760).setDepth(DEPTH.popups);
     c.add(text(this.scene, 0, 0, `Round ${round + 1}`, { size: 150, color: C.paper, stroke: 14, align: 'center' }).setOrigin(0.5));
-    c.add(text(this.scene, 0, 120, `Hit ${ROUND_QUOTA[round]} of ${TARGETS_PER_ROUND} to move on`, { size: 54, font: 'hand', color: C.paper, stroke: 7, align: 'center' }).setOrigin(0.5));
+    c.add(text(this.scene, 0, 130, `Hit ${ROUND_QUOTA[round]} of ${TARGETS_PER_ROUND} to move on`, { size: 54, font: 'hand', color: C.paper, stroke: 7, align: 'center' }).setOrigin(0.5));
     c.setAlpha(0).setScale(0.8).setRotation(-0.04);
     this.scene.tweens.add({ targets: c, alpha: 1, scale: 1, duration: 260, ease: 'Back.easeOut' });
     this.scene.tweens.add({ targets: c, alpha: 0, y: 700, delay: 1150, duration: 300, onComplete: () => c.destroy() });
@@ -156,7 +162,7 @@ export class Hud {
   }
 
   notice(s: string): void {
-    const t = text(this.scene, 540, 1420, s, { size: 60, font: 'hand', color: C.paper, stroke: 8, align: 'center' }).setOrigin(0.5).setDepth(DEPTH.popups).setAlpha(0);
+    const t = fit(text(this.scene, 540, 1420, s, { size: 60, font: 'hand', color: C.paper, stroke: 8, align: 'center' }).setOrigin(0.5).setDepth(DEPTH.popups).setAlpha(0), 980);
     this.scene.tweens.add({ targets: t, alpha: 1, duration: 200, yoyo: true, hold: 1200, onComplete: () => t.destroy() });
   }
 }

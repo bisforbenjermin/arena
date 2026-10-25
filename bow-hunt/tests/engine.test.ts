@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as C from '../src/engine/constants';
 import { generateRunPlan } from '../src/engine/plan';
-import { SPECIES } from '../src/engine/species';
+import { SPECIES, isBonus } from '../src/engine/species';
 import { spawnTarget, stepTarget } from '../src/engine/targets';
 import { aimDirection, fireArrow, launchSpeed, segmentHitsCircle, stepArrow } from '../src/engine/arrows';
 import { comboQuarters, hitPoints, isLongShot } from '../src/engine/scoring';
@@ -33,7 +33,8 @@ describe('plan', () => {
       const p = generateRunPlan(`shape-${i}`);
       expect(p.rounds).toHaveLength(C.ROUNDS);
       for (const r of p.rounds) {
-        expect(r.targets.filter((t) => t.species !== 'star' && t.species !== 'hummer')).toHaveLength(C.TARGETS_PER_ROUND);
+        expect(r.targets.filter((t) => !isBonus(t.species))).toHaveLength(C.TARGETS_PER_ROUND);
+        expect(r.targets.filter((t) => t.species === 'quiver' || t.species === 'fire')).toHaveLength(1);
         expect(r.targets.filter((t) => t.species === 'star')).toHaveLength(1);
         expect(r.targets.filter((t) => t.species === 'hummer').length).toBeLessThanOrEqual(1);
         const golds = r.targets.filter((t) => t.species === 'golden').length;
@@ -67,7 +68,7 @@ describe('plan', () => {
     let lines = 0;
     for (let i = 0; i < 200; i++) {
       generateRunPlan(`line-${i}`).rounds.forEach((r, round) => {
-        const birds = r.targets.filter((t) => t.species !== 'star' && t.species !== 'hummer');
+        const birds = r.targets.filter((t) => !isBonus(t.species));
         const run = birds.filter((t) => t.gap === C.FORMATION_GAP && t.jinks.length === 0 && t.amp === 8).length;
         if (round === 0) expect(run).toBe(0);
         if (run > 0) lines++;
@@ -231,6 +232,32 @@ describe('sim', () => {
     expect(r.s.stats).toMatchObject({ shots: 1, hits: 2, multiHits: 1, bestStreak: 1 });
     s = r.s;
     expect(s.summaries[0]).toMatchObject({ hits: 2, passed: false });
+  });
+});
+
+describe('power-ups', () => {
+  const still = (species: TargetPlan['species']): TargetPlan => ({ species, dir: 1, entryY: 0, path: 'glide', amp: 0, period: 100, phase: 0, speedPct: 100, gap: 1, jinks: [] });
+  const place = (tp: TargetPlan, id: number, y: number) => ({ ...spawnTarget(tp, 0, id, 0), x: 270 * M, y: y * M, baseY: y * M, goalY: y * M, vx: 0 });
+  const plan = generateRunPlan('pu');
+
+  it('the arrow bundle adds 3 arrows', () => {
+    const s0: GameState = { ...toPlaying(createInitialState(plan)), spawned: 99, nextId: 1, targets: [place(still('quiver'), 0, 600)] };
+    const r = run(s0, [...shot(270, 0), ...repeat(idle, 20)]);
+    expect(r.events.some((e) => e.type === 'powerUp' && e.kind === 'quiver')).toBe(true);
+    expect(r.s.arrowsLeft).toBe(C.BOWS[0].arrows - 1 + C.QUIVER_ARROWS);
+  });
+
+  it('fire arrows hit in a wider circle for the next 5 shots', () => {
+    const s0: GameState = { ...toPlaying(createInitialState(plan)), spawned: 99, nextId: 1, targets: [place(still('fire'), 0, 600)] };
+    const r = run(s0, [...shot(270, 0), ...repeat(idle, 20)]);
+    expect(r.s.fireShots).toBe(C.FIRE_SHOTS);
+    // a goose 70 units off the arrow's line: a plain arrow misses, a fire arrow hits
+    const goose = (s: GameState) => ({ ...s, targets: [{ ...place(still('goose'), 5, 500), x: (270 + 70) * M }], nextId: 6 });
+    const plain = run(goose({ ...r.s, fireShots: 0 }), [...shot(270, 0), ...repeat(idle, 30)]);
+    const lit = run(goose(r.s), [...shot(270, 0), ...repeat(idle, 30)]);
+    expect(plain.events.some((e) => e.type === 'hit')).toBe(false);
+    expect(lit.events.some((e) => e.type === 'hit')).toBe(true);
+    expect(lit.s.fireShots).toBe(C.FIRE_SHOTS - 1);
   });
 });
 

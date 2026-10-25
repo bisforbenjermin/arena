@@ -3,7 +3,8 @@ import type { Species } from '../../engine/species';
 import { circle, ellipse, sticker, type Ctx } from './canvas';
 
 export const WING_FRAMES = [-0.15, -1.35, -2.55] as const;   // radians from straight up, toward the tail
-export const BIRD_CANVAS: Record<Exclude<Species, 'star'>, [number, number]> = {
+export type Bird = Exclude<Species, 'star' | 'quiver' | 'fire'>;
+export const BIRD_CANVAS: Record<Bird, [number, number]> = {
   duck: [160, 120], goose: [230, 160], turkey: [210, 170], golden: [210, 170], hummer: [120, 90],
 };
 
@@ -164,7 +165,7 @@ function drawSpecies(ctx: Ctx, species: Species, a: number): void {
 }
 
 /** One sticker canvas per wing frame. */
-export function birdFrames(species: Exclude<Species, 'star'>): HTMLCanvasElement[] {
+export function birdFrames(species: Bird): HTMLCanvasElement[] {
   const [w, h] = BIRD_CANVAS[species];
   const paper = species === 'golden' ? '#FFF8E1' : '#F7ECD8';
   return WING_FRAMES.map((a) => sticker(w, h, (ctx) => drawSpecies(ctx, species, a), 6, paper));

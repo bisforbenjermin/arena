@@ -2,8 +2,8 @@ import { C } from '../config';
 import { circle, makeCanvas } from './canvas';
 import { birdIcon } from './birds';
 
-/** Arrow pointing right. The tip is at (w-2, h/2), so the sprite origin can sit on the engine's arrow position. */
-export function drawArrow(): HTMLCanvasElement {
+/** Arrow pointing right. The tip is at (w-2, h/2), so the sprite origin can sit on the engine's arrow position. `fire` adds a burning head. */
+export function drawArrow(fire = false): HTMLCanvasElement {
   const w = 104, h = 20;
   const { c, ctx } = makeCanvas(w, h);
   const y = h / 2;
@@ -17,7 +17,53 @@ export function drawArrow(): HTMLCanvasElement {
     ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.stroke();
   }
   ctx.beginPath(); ctx.moveTo(w - 2, y); ctx.lineTo(w - 22, y - 7); ctx.lineTo(w - 18, y); ctx.lineTo(w - 22, y + 7); ctx.closePath();
-  ctx.fillStyle = '#C9CED6'; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = fire ? '#FF7A1A' : '#C9CED6'; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
+  if (fire) {
+    ctx.globalCompositeOperation = 'destination-over';
+    const g = ctx.createRadialGradient(w - 12, y, 1, w - 12, y, 12);
+    g.addColorStop(0, 'rgba(255,214,90,1)'); g.addColorStop(1, 'rgba(255,90,20,0)');
+    ctx.fillStyle = g; ctx.fillRect(w - 26, 0, 26, h);
+  }
+  return c;
+}
+
+/** Arrow bundle tied to a red balloon: shoot it for +3 arrows. */
+export function drawQuiverPickup(): HTMLCanvasElement {
+  const { c, ctx } = makeCanvas(110, 150);
+  ctx.translate(55, 0);
+  ctx.save(); ctx.shadowColor = 'rgba(43,29,36,0.45)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
+  ctx.beginPath(); ctx.ellipse(0, 34, 28, 32, 0, 0, Math.PI * 2); ctx.fillStyle = '#F7ECD8'; ctx.fill();
+  ctx.restore();
+  ctx.beginPath(); ctx.ellipse(0, 34, 23, 27, 0, 0, Math.PI * 2); ctx.fillStyle = C.cranberry; ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-8, 24, 6, 9, -0.4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fill();
+  ctx.strokeStyle = '#E8D6B0'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 61); ctx.quadraticCurveTo(6, 74, 0, 84); ctx.stroke();
+  ctx.save(); ctx.translate(0, 112); ctx.rotate(0.12);
+  ctx.fillStyle = C.ink; ctx.beginPath(); ctx.roundRect(-17, -24, 34, 54, 7); ctx.fill();
+  ctx.fillStyle = '#8A5A44'; ctx.beginPath(); ctx.roundRect(-14, -21, 28, 48, 5); ctx.fill();
+  for (const dx of [-8, 0, 8]) {
+    ctx.strokeStyle = '#D1A25F'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(dx, -22); ctx.lineTo(dx, -36); ctx.stroke();
+    ctx.fillStyle = dx === 0 ? C.paper : C.cranberry; ctx.beginPath(); ctx.moveTo(dx - 4, -34); ctx.lineTo(dx, -42); ctx.lineTo(dx + 4, -34); ctx.fill();
+  }
+  ctx.fillStyle = C.paper; ctx.font = 'bold 20px Georgia, serif'; ctx.textAlign = 'center'; ctx.fillText('+3', 0, 12);
+  ctx.restore();
+  return c;
+}
+
+/** Fire-arrow token: a burning arrowhead in a ring. Shoot it for 5 fire arrows. */
+export function drawFirePickup(): HTMLCanvasElement {
+  const { c, ctx } = makeCanvas(110, 110);
+  ctx.translate(55, 55);
+  ctx.save(); ctx.shadowColor = 'rgba(43,29,36,0.45)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
+  circle(ctx, 0, 0, 40, '#F7ECD8');
+  ctx.restore();
+  const g = ctx.createRadialGradient(0, 6, 4, 0, 0, 36);
+  g.addColorStop(0, '#FFE08A'); g.addColorStop(0.55, '#FF8A1F'); g.addColorStop(1, '#C2301A');
+  circle(ctx, 0, 0, 35, g);
+  ctx.beginPath();
+  ctx.moveTo(0, -26); ctx.quadraticCurveTo(16, -6, 10, 14); ctx.quadraticCurveTo(4, 24, 0, 26); ctx.quadraticCurveTo(-4, 24, -10, 14); ctx.quadraticCurveTo(-16, -6, 0, -26);
+  ctx.fillStyle = '#FFF6D1'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(9, 6); ctx.lineTo(0, 2); ctx.lineTo(-9, 6); ctx.closePath();
+  ctx.fillStyle = C.ink; ctx.fill();
   return c;
 }
 

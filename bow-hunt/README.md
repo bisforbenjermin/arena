@@ -17,6 +17,9 @@ Portrait mobile archery game. Ducks, geese, turkeys and a rare golden turkey cro
 - **Bonus targets** (don't count toward the quota):
   - **Shooting stars:** one per round, high and fast. Each pays 250; hitting 3 in one hunt adds 3,000.
   - **Hummingbirds:** about every other round, one zips across just under the HUD. Tiny and very fast. Pays 2,000.
+- **Power-ups** (one floats across each round; shoot it to collect):
+  - **Arrow bundle** on a red balloon: +3 arrows this round.
+  - **Fire arrows** token: your next 5 arrows burn and hit in a 60% wider circle. Unused fire arrows carry into the next round.
 - **Multi-kills:** arrows pass through what they hit. A second bird on one arrow pays +200, a third +600, a fourth +1,500 (doubled with the Longbow). From round 2, some rounds send 3 birds (4 from round 4) in a slanted line, so a triple or quad is possible but takes a well-timed, well-aimed shot.
 - **Points:** goose 75, turkey 100, duck 150, golden turkey 1,000 (about one round in six has one).
   - Hits more than 600 units from the bow pay +50%.
@@ -31,7 +34,7 @@ Portrait mobile archery game. Ducks, geese, turkeys and a rare golden turkey cro
 
 ```
 npm install
-npm test            # 51 tests: engine rules, scoring, replay, skill gradient, aim mapping, run loop
+npm test            # 53 tests: engine rules, scoring, replay, skill gradient, aim mapping, run loop
 npm run dev         # http://localhost:5173
 npm run dev:phone   # same, reachable from a phone on your Wi-Fi (open the Network URL it prints)
 npm run build       # static site in dist/

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { BOWS, MILLI as M, GROUND_Y, STARS_FOR_BONUS } from '../../engine/constants';
-import { isBonus } from '../../engine/species';
+import { isBonus, isPowerUp } from '../../engine/species';
 import { upgradeAfter } from '../../engine/sim';
 import type { GameEvent, Mode, Target } from '../../engine/types';
 import { sfx } from '../audio/sfx';
@@ -11,7 +11,7 @@ import { RunController } from '../run';
 import { buildBackdrop } from '../ui/backdrop';
 import { BowView } from '../ui/bow';
 import { Hud } from '../ui/hud';
-import { button, drawPause, drawSpeaker, iconButton, tag, text } from '../ui/widgets';
+import { button, drawPause, drawSpeaker, fit, iconButton, tag, text } from '../ui/widgets';
 import { getMuted, setMuted } from '../session';
 
 type BirdView = { sprite: Phaser.GameObjects.Sprite; glow?: Phaser.GameObjects.Image; spin: number; age: number };
@@ -133,6 +133,7 @@ export class PlayScene extends Phaser.Scene {
       case 'fire': {
         sfx.release(e.power);
         this.bow.kick();
+        this.hud.setFire(st.fireShots);
         this.hud.setArrows(st.arrowsLeft, BOWS[st.bow].arrows);
         break;
       }
@@ -152,6 +153,7 @@ export class PlayScene extends Phaser.Scene {
         }
         if (e.long) this.fx.note(x, noteY, 'Long shot', C.gold, delay);
         if (e.species === 'star') { this.hud.setStars(st.stats.stars); this.fx.note(x, y + 50, `Star ${st.stats.stars} of ${STARS_FOR_BONUS}`, C.gold, 100); }
+        else if (isPowerUp(e.species)) { /* the powerUp event shows its own note */ }
         else if (e.species === 'hummer') { this.fx.note(x, y + 50, 'Hummingbird!', C.gold, 100); this.fx.shake('big'); }
         else this.hud.markHit(e.species === 'golden');
         this.hud.setScore(st.score);
@@ -160,6 +162,14 @@ export class PlayScene extends Phaser.Scene {
       }
       case 'spawn': {
         if (e.species === 'hummer') sfx.zip();
+        break;
+      }
+      case 'powerUp': {
+        const px = e.x / M * S, py = e.y / M * S;
+        if (e.kind === 'quiver') { this.fx.note(px, py + 40, '+3 arrows', C.paper, 60); this.hud.setArrows(st.arrowsLeft, Math.max(BOWS[st.bow].arrows, st.arrowsLeft)); }
+        else this.fx.note(px, py + 40, 'Fire arrows!', C.gold, 60);
+        this.hud.setFire(st.fireShots);
+        sfx.multi(2);
         break;
       }
       case 'starBonus': {
@@ -212,9 +222,10 @@ export class PlayScene extends Phaser.Scene {
     // golden art is drawn on the turkey body but its hit circle is smaller (26 vs 30), so shrink it to match
     // Art is drawn a bit smaller than the (generous) hit circles; scale it up partway. Golden turkeys are smaller turkeys.
     const scale = t.species === 'golden' ? 1.25 * 42 / 49 : t.species === 'hummer' ? 1.1 : 1.25;
-    const sprite = this.add.sprite(0, 0, t.species === 'star' ? 'star' : `${t.species}-0`).setDepth(DEPTH.birds).setFlipX(t.dir < 0).setScale(t.species === 'star' ? 1 : scale);
-    if (t.species !== 'star') sprite.play({ key: `${t.species}-flap`, startFrame: Math.floor(Math.random() * 4) });
-    const glow = t.species === 'golden' || t.species === 'star' || t.species === 'hummer'
+    const still = t.species === 'star' || isPowerUp(t.species);
+    const sprite = this.add.sprite(0, 0, still ? t.species : `${t.species}-0`).setDepth(DEPTH.birds).setFlipX(t.dir < 0 && !still).setScale(isPowerUp(t.species) ? 1.45 : still ? 1 : scale);
+    if (!still) sprite.play({ key: `${t.species}-flap`, startFrame: Math.floor(Math.random() * 4) });
+    const glow = t.species === 'golden' || t.species === 'star' || t.species === 'hummer' || isPowerUp(t.species)
       ? this.add.image(0, 0, 'glow').setDepth(DEPTH.birds - 1).setBlendMode(Phaser.BlendModes.ADD).setScale(1.1)
       : undefined;
     return { sprite, glow, spin: 0, age: 0 };
@@ -236,6 +247,11 @@ export class PlayScene extends Phaser.Scene {
         v.sprite.rotation += v.spin;
         if (v.glow) v.glow.setVisible(false);
       } else {
+        if (isPowerUp(t.species)) {
+          v.sprite.rotation = Math.sin(v.age * 0.05) * 0.12;
+          if (v.glow) v.glow.setPosition(x, y).setScale(0.9 + 0.12 * Math.sin(v.age * 0.12)).setAlpha(0.55);
+          continue;
+        }
         if (t.species === 'star') {
           v.sprite.rotation += 0.06 * t.dir;
           if (v.glow) v.glow.setPosition(x, y).setAlpha(0.6 + 0.3 * Math.sin(v.age * 0.2));
@@ -261,14 +277,15 @@ export class PlayScene extends Phaser.Scene {
     for (const a of cur.arrows) {
       live.add(a.id);
       let img = this.arrows.get(a.id);
-      if (!img) { img = this.add.image(0, 0, 'arrow').setOrigin((104 - 2) / 104, 0.5).setDepth(DEPTH.arrows); this.arrows.set(a.id, img); }
+      if (!img) { img = this.add.image(0, 0, a.fire ? 'arrow-fire' : 'arrow').setOrigin((104 - 2) / 104, 0.5).setDepth(DEPTH.arrows); this.arrows.set(a.id, img); }
       const p = prevA.get(a.id) ?? a;
       img.setPosition(lerp(p.x, a.x, alpha) / M * S, lerp(p.y, a.y, alpha) / M * S).setRotation(Math.atan2(a.vy, a.vx));
+      if (a.fire && cur.tick % 3 === 0) this.fx.ember(img.x, img.y);
     }
     for (const [id, img] of this.arrows) if (!live.has(id)) { img.destroy(); this.arrows.delete(id); }
 
     const armed = cur.phase === 'playing' && cur.arrowsLeft > 0;
-    this.bow.update(this.aim, cur.drawTicks, armed || cur.phase === 'intro', this.drawing && cur.phase === 'playing');
+    this.bow.update(this.aim, cur.drawTicks, armed || cur.phase === 'intro', this.drawing && cur.phase === 'playing', cur.fireShots > 0);
     const full = cur.drawTicks >= BOWS[cur.bow].drawMax;
     if (full && !this.wasFull && armed) sfx.fullDraw();
     this.wasFull = full;
@@ -317,6 +334,7 @@ export class PlayScene extends Phaser.Scene {
     const bow = this.run.state.bow;
     this.hud.setArrows(this.run.state.arrowsLeft, BOWS[bow].arrows);
     this.hud.setStreak(this.run.state.streak);
+    this.hud.setFire(this.run.state.fireShots);
     if (bow !== before) { this.bow.setBow(bow); this.bow.celebrate(); this.hud.setBow(BOWS[bow].name); }
     this.scene.resume();
     this.startRoundBanner();
@@ -340,8 +358,8 @@ export class PlayScene extends Phaser.Scene {
     const veil = this.add.rectangle(0, 0, VIEW_W, VIEW_H, N.plum, 0.6).setOrigin(0).setInteractive();
     const card = this.add.container(540, 760);
     card.add(tag(this, 640, 520, { twine: true }).setPosition(-320, -220));
-    card.add(text(this, 0, -110, 'Paused', { size: 96, align: 'center' }).setOrigin(0.5));
-    card.add(text(this, 0, -20, 'The flock waits for you.', { size: 46, font: 'hand', align: 'center' }).setOrigin(0.5));
+    card.add(text(this, 0, -120, 'Paused', { size: 96, align: 'center' }).setOrigin(0.5));
+    card.add(text(this, 0, -16, 'The flock waits for you.', { size: 46, font: 'hand', align: 'center' }).setOrigin(0.5));
     c.add([veil, card]);
     c.add(button(this, 540, 880, 460, 130, 'Resume', 'primary', () => this.setPaused(false)));
     c.add(button(this, 540, 1040, 460, 120, 'Quit to menu', 'kraft', () => { this.scene.start('Title'); }));

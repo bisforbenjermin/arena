@@ -20,6 +20,13 @@ export function text(scene: Phaser.Scene, x: number, y: number, s: string, o: Te
   return t;
 }
 
+/** Shrinks a text to fit `maxWidth` (never grows it). Call again after setText. */
+export function fit<T extends Phaser.GameObjects.Text>(t: T, maxWidth: number): T {
+  t.setScale(1);
+  if (t.width > maxWidth) t.setScale(maxWidth / t.width);
+  return t;
+}
+
 /** A kraft tag: notched corners, a punched hole and twine running up off the top. Origin is its top-left. */
 export function tag(scene: Phaser.Scene, w: number, h: number, opts: { twine?: boolean; fill?: number; hole?: boolean } = {}): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics();
