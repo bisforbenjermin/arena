@@ -1,55 +1,64 @@
 # CONTEXT CAPSULE
-Updated: 261023-1 (prev: 261020-5)
+Updated: 261024-1 (prev: 261023-1)
 Keep this under one page. Rewrite at every significant direction change.
 
 ---
 
 ## NEXT ACTION
-**G3** — unblocked by G2. Decide the move:
-- `/design G3` to run the design loop (Fable proposes, cold-critic attacks, founder rules), or
-- paste a G3 brief if one already exists in `specs/`
+Two things gate G3 — pick one:
+- **Rule FORMAT-1 v2** (`governance/00-COMMAND/PROPOSED/FORMAT-1-v2.md`, commit 0e4bbf4) — thin v2 after cold-critic killed v1 with 6 KILLs. `/rule FORMAT-1 <words>`.
+- **Resolve bow-hunt stakes HANDOFF** (3a7a135) — unblocks GAME-01 build.
 
-L1 (lore) is still yours to write — no agents can touch L2–L5 until it's done.
+G3 remains next in factory sequence but is downstream of both. L1 (lore) still yours — blocks L2–L5.
 
 ---
 
 ## ACTIVE FRONT
 **Venture:** ARENA (The Arcade Realm)
-**Phase:** Build — Game Factory in progress. G1 + G2 done; G3 next.
+**Phase:** Build — Game Factory in progress. G1 + G2 done; G3 gated on FORMAT-1 + stakes.
 
 **Foundation status:**
 - F1 ✅ GameModule contract + scoring normalizer
 - F2 ✅ Database schema (9 migrations)
 - F3 ✅ PWA shell + Supabase Auth + eligibility gate (Next.js, STACK-1)
-- F4 ✅ Two reference games (precision-tap, pressure-hold)
+- F4 ✅ Two reference games (precision-tap, pressure-hold); precision-tap view polished 261023 (446b174, PR-3 safe)
 
 **Game Factory status:**
-- G1 ✅ Generation service (service.ts, budget.ts, queue.ts, brief-schema.ts, prompt/system.md+inject.ts, components/prng+canvas) — commit f88d036
-- G2 ✅ Sandbox runner + 5 gates (forbidden-apis, compile, bundle-size, determinism, memory-leak); jsdom (Playwright incompatible on mac12) — commit 3dcac88
-- G3 ⏭ next
+- G1 ✅ Generation service — commit f88d036
+- G2 ✅ Sandbox runner + 5 gates; jsdom (Playwright incompatible on mac12) — commit 3dcac88
+- G3 ⏭ next, gated
+
+**In flight (261023):**
+- FORMAT-1 — high-score rounds standardized. v1 proposed 4f7de06, cold-critic killed w/ 6 KILLs + 3 FIXes (77024fd), thin v2 rewrite 0e4bbf4. **Awaits founder ruling.**
+- GAME-01 bow hunt — spec saved 4bd0fb9; HANDOFF for stakes written 3a7a135. **Build blocked.**
 
 **Repo structure:**
-- Operable (CI): `contracts/` · `db/` · `games/` · `tests/` · `app/` — at root
-- Specs: `specs/` — 26 files covering F, G, R, L, C layers (see `specs/00_INDEX.md`)
+- Operable (CI): `contracts/` · `db/` · `games/` · `tests/` · `app/`
+- Specs: `specs/` — 26 files (`specs/00_INDEX.md`)
 - Legal: `governance/40-LEGAL/` — C4_ADDENDUM_1_vault_arv_coin.md
 - Governance: `governance/00-COMMAND/` · `governance/10-CANON/` · `governance/90-ARCHIVE/`
 
-**Build crew (added 261022–261023, see CLAUDE.md):**
+**Build crew (261022–261023, see CLAUDE.md):**
 - `/design <ID>` · `/critique <ID>` · `/rule <ID> <words>` · `/build-next <ID>`
 - Agents: spec-reconciler · builder · verifier · cold-critic
 - `npm test` runs every test; CI runs on push + PR
 - `.claude/hooks/guard-paths.mjs` blocks writes to `contracts/`, `governance/`, July specs outside the right session
 
 **Frozen rulings (governance/10-CANON/DECISIONS/) — 20 files:**
-- PR-1..6 (game contract rules) — RULED 2026-09-06
+- PR-1..6 — RULED 2026-09-06
 - GTM-1 · GTM-2 · CP-0 · CREDIT-1 — RULED 2026-07-30; CREDIT-1 ratified 2026-10-20
 - OPS-1 · OPS-2 · OPS-3 — RULED 2026-07-19 / 2026-08-10
 - AUD-1 · BRAND-1..3 · CANON-2 · GTM-4 · STACK-1 — RULED 2026-10-20
 
 **Open items:**
+- FORMAT-1 v2 awaiting ruling (see above)
+- Bow-hunt stakes HANDOFF awaiting ruling (see above)
 - World name (Freehold / Arclight / Quarterlight / Elsewhere) — blocks BRAND-1, trademark search
 - GTM-3 The First Cache — PROPOSED; needs max-weight session to supersede GTM-1
 - OPS-4 Operating board + cold critique — PROPOSED, parked in `governance/00-COMMAND/PROPOSED/`
+
+**Housekeeping (261024):**
+- `~/Claude/ARENA/ops/` marked SUPERSEDED (README.md added); its stale v2 capsule renamed to `CONTEXT_CAPSULE.ARCHIVED-2026-08-29.md`. Lives outside this repo.
 
 ---
 
@@ -61,10 +70,8 @@ L1 (lore) is still yours to write — no agents can touch L2–L5 until it's don
 ---
 
 ## LAST SESSION
-261023 — Orientation only; capsule drift confirmed and regenerated to 261023-1. No rulings. No code touched.
+261024 — Orientation; capsule drift confirmed (stamp 261023-1 behind day-of work); regenerated to 261024-1. ops/ supersession noted. No rulings. No code touched.
 
-261022 — G2 built: sandbox runner + 5 gates; jsdom instead of Playwright. Pushed 3dcac88.
+261023 — Full day: capsule regen 79249f8; precision-tap view polish 446b174 (PR-3 safe); GAME-01 bow hunt spec 4bd0fb9; bow-hunt stakes HANDOFF 3a7a135; FORMAT-1 v1 proposed 4f7de06 → cold-critic 6 KILLs 77024fd → thin v2 0e4bbf4; close 67dd777.
 
-261022 — G1 built: generation service + prompt + components. Pushed f88d036.
-
-261020 — Capsule regenerated (261020-5): fixed three drift items. No rulings.
+261022 — G2 built (3dcac88). G1 built (f88d036).
