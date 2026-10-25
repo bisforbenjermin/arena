@@ -34,7 +34,7 @@ export class TitleScene extends Phaser.Scene {
     this.note(col, 1280, 'New flock every time. Aim guide on.', getBest('practice'), 'Best');
 
     const how = this.add.container(540, 1640).setDepth(DEPTH.hud + 1);
-    how.add(text(this, 0, 0, 'Press anywhere and drag back to draw.\nHold longer for more power. Let go to shoot.\nLead your bird. Golden turkeys pay 1,000.', {
+    how.add(text(this, 0, 0, 'Drag back to draw, or aim with ← → and hold space.\nLet go to shoot. Lead your bird.\nHit 3 shooting stars for a 3,000 bonus.', {
       size: 44, font: 'hand', color: C.paper, stroke: 6, align: 'center',
     }).setOrigin(0.5));
 
@@ -47,6 +47,8 @@ export class TitleScene extends Phaser.Scene {
     sound.box.setDepth(DEPTH.hud);
 
     this.input.once('pointerdown', () => sfx.unlock());
+    this.input.keyboard?.once('keydown-ENTER', () => start('daily'));
+    this.input.keyboard?.once('keydown-SPACE', () => start('practice'));
     this.cameras.main.fadeIn(260, 43, 29, 36);
   }
 
@@ -58,7 +60,7 @@ export class TitleScene extends Phaser.Scene {
   /** Decorative flock crossing behind the title. Not the game: no seed, no scoring. */
   private flyBy(): void {
     const launch = () => {
-      const species = Phaser.Utils.Array.GetRandom(SPECIES_LIST.filter((s) => s !== 'golden'));
+      const species = Phaser.Utils.Array.GetRandom(SPECIES_LIST.filter((s) => s !== 'golden' && s !== 'star'));
       const dir = Math.random() < 0.5 ? 1 : -1;
       const y = Math.random() < 0.6 ? 150 + Math.random() * 170 : 1360 + Math.random() * 90;   // above the title or over the field, never across the text
       const bird = this.add.sprite(dir > 0 ? -120 : VIEW_W + 120, y, `${species}-0`).play(`${species}-flap`).setDepth(DEPTH.birds).setFlipX(dir < 0).setScale(0.8 + Math.random() * 0.3);

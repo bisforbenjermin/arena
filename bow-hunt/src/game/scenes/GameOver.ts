@@ -17,7 +17,7 @@ export class GameOverScene extends Phaser.Scene {
     const last = st.summaries[st.summaries.length - 1];
 
     this.add.rectangle(0, 0, VIEW_W, VIEW_H, N.plum, 0.62).setOrigin(0).setInteractive();
-    const w = 860, h = 1360;
+    const w = 860, h = 1430;
     const card = this.add.container(540, -1400);
     card.add(tag(this, w, h, { twine: true }).setPosition(-w / 2, 0));
     card.add(text(this, 0, 70, cleared ? 'Hunt complete' : 'The flock got away', { size: cleared ? 84 : 70, align: 'center' }).setOrigin(0.5, 0));
@@ -49,14 +49,15 @@ export class GameOverScene extends Phaser.Scene {
       ['Long shots', String(st.stats.longShots)],
       ['Two or more on one arrow', String(st.stats.multiHits)],
       ['Golden turkeys', String(st.stats.goldenHits)],
+      ['Shooting stars', `${st.stats.stars} of 3`],
     ];
     rows.forEach(([k, v], i) => {
-      const y = 560 + i * 66;
+      const y = 556 + i * 62;
       card.add(text(this, -w / 2 + 70, y, k, { size: 44, font: 'hand' }));
       card.add(text(this, w / 2 - 70, y, v, { size: 40, align: 'right' }).setOrigin(1, 0));
     });
     const check = data.verified ? 'Checked: a replay of your shots scores the same.' : 'Check failed: the replay disagrees, so this run won\'t count.';
-    card.add(text(this, 0, 560 + rows.length * 66 + 18, check, { size: 34, font: 'hand', color: data.verified ? '#3E5A1E' : C.cranberry, align: 'center', wrap: w - 100 }).setOrigin(0.5, 0));
+    card.add(text(this, 0, 556 + rows.length * 62 + 18, check, { size: 34, font: 'hand', color: data.verified ? '#3E5A1E' : C.cranberry, align: 'center', wrap: w - 100 }).setOrigin(0.5, 0));
 
     const again = () => {
       this.scene.stop();
@@ -64,10 +65,11 @@ export class GameOverScene extends Phaser.Scene {
     };
     const menu = () => { this.scene.stop('Play'); this.scene.start('Title'); };
     card.add(button(this, 0, h - 240, 560, 140, 'Hunt again', 'primary', again));
+    this.input.keyboard?.once('keydown-ENTER', again);
     card.add(button(this, 0, h - 90, 560, 116, 'Menu', 'kraft', menu));
 
     card.setRotation(0.07);
-    this.tweens.add({ targets: card, y: 220, duration: 600, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: card, y: 170, duration: 600, ease: 'Back.easeOut' });
     this.tweens.add({ targets: card, rotation: 0, duration: 1400, ease: 'Elastic.easeOut', easeParams: [1.1, 0.4] });
   }
 }

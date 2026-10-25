@@ -1,14 +1,15 @@
 import {
-  MILLI as M, BOW_X, BOW_Y, WORLD_W, WORLD_H, ARROW_MIN_SPEED, ARROW_MAX_SPEED, ARROW_GRAVITY,
-  DRAW_MAX_TICKS, AIM_MAX_SLOPE, ARROW_MARGIN,
+  MILLI as M, BOW_X, BOW_Y, WORLD_W, WORLD_H, ARROW_MIN_SPEED, ARROW_GRAVITY,
+  AIM_MAX_SLOPE, ARROW_MARGIN, BOW_TIERS,
 } from './constants';
 import { isqrt } from './math';
 import type { Arrow } from './types';
 
-/** Launch speed for a draw of `drawTicks`, in milli-units per tick. */
-export function launchSpeed(drawTicks: number): number {
-  const d = Math.min(drawTicks, DRAW_MAX_TICKS);
-  return ARROW_MIN_SPEED * M + Math.trunc((ARROW_MAX_SPEED - ARROW_MIN_SPEED) * M * d / DRAW_MAX_TICKS);
+/** Launch speed for a draw of `drawTicks` with bow `tier`, in milli-units per tick. Better bows draw faster and shoot harder. */
+export function launchSpeed(drawTicks: number, tier = 0): number {
+  const b = BOW_TIERS[tier];
+  const d = Math.min(drawTicks, b.drawMax);
+  return ARROW_MIN_SPEED * M + Math.trunc((b.maxSpeed - ARROW_MIN_SPEED) * M * d / b.drawMax);
 }
 
 /** Unit-free aim direction from the bow toward (aimX, aimY), forced upward and no flatter than AIM_MAX_SLOPE. */
@@ -21,10 +22,10 @@ export function aimDirection(aimX: number, aimY: number): { dx: number; dy: numb
   return { dx, dy };
 }
 
-export function fireArrow(drawTicks: number, aimX: number, aimY: number, id: number): Arrow {
+export function fireArrow(drawTicks: number, aimX: number, aimY: number, id: number, tier = 0): Arrow {
   const { dx, dy } = aimDirection(aimX, aimY);
   const len = isqrt(dx * dx + dy * dy);
-  const speed = launchSpeed(drawTicks);
+  const speed = launchSpeed(drawTicks, tier);
   return {
     id, x: BOW_X * M, y: BOW_Y * M,
     vx: Math.trunc(dx * speed / len), vy: Math.trunc(dy * speed / len),

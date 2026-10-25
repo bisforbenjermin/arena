@@ -33,7 +33,8 @@ describe('plan', () => {
       const p = generateRunPlan(`shape-${i}`);
       expect(p.rounds).toHaveLength(C.ROUNDS);
       for (const r of p.rounds) {
-        expect(r.targets).toHaveLength(C.TARGETS_PER_ROUND);
+        expect(r.targets).toHaveLength(C.TARGETS_PER_ROUND + 1);
+        expect(r.targets.filter((t) => t.species === 'star')).toHaveLength(1);
         const golds = r.targets.filter((t) => t.species === 'golden').length;
         expect(golds).toBe(r.golden ? 1 : 0);
         for (const t of r.targets) {
@@ -85,6 +86,14 @@ describe('targets', () => {
 });
 
 describe('arrows', () => {
+  it('each bow upgrade draws faster and shoots harder', () => {
+    for (let t = 1; t < C.BOW_TIERS.length; t++) {
+      expect(C.BOW_TIERS[t].drawMax).toBeLessThan(C.BOW_TIERS[t - 1].drawMax);
+      expect(launchSpeed(C.BOW_TIERS[t].drawMax, t)).toBeGreaterThan(launchSpeed(C.BOW_TIERS[t - 1].drawMax, t - 1));
+    }
+    expect(C.TIER_BY_ROUND).toHaveLength(C.ROUNDS);
+  });
+
   it('launch speed scales with draw time and caps at full draw', () => {
     expect(launchSpeed(0)).toBe(C.ARROW_MIN_SPEED * M);
     expect(launchSpeed(C.DRAW_MAX_TICKS)).toBe(C.ARROW_MAX_SPEED * M);

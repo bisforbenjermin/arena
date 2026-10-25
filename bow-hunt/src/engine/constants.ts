@@ -13,7 +13,7 @@ export const ROUND_QUOTA = [5, 6, 6, 7, 8];
 export const INTRO_TICKS = 90, FIRST_SPAWN_TICKS = 20;
 
 // Difficulty by round
-export const ROUND_SPEED = [2200, 2600, 3000, 3400, 3900];          // milli-units per tick, before species %
+export const ROUND_SPEED = [1600, 1850, 2150, 2450, 2800];          // milli-units per tick, before species %
 export const SPAWN_GAP: readonly (readonly [number, number])[] = [[70, 130], [60, 115], [50, 100], [40, 85], [30, 70]];
 export const JINKS = [0, 1, 2, 3, 4];                                // sudden height changes per target
 export const JINK_RANGE = [0, 60, 90, 120, 150];                    // units
@@ -25,9 +25,16 @@ export const GOLDEN_ONE_IN = 6;                                      // chance p
 // Target motion
 export const FLEE_SPEED = 9, FALL_GRAVITY = 320;                    // units/tick; milli-units/tick²
 
-// Bow and arrows
+// Bow and arrows. DRAW_MAX_TICKS and ARROW_MAX_SPEED are the starting bow; BOW_TIERS upgrades them.
 export const DRAW_MIN_TICKS = 5, DRAW_MAX_TICKS = 40;
 export const ARROW_MIN_SPEED = 14, ARROW_MAX_SPEED = 32;            // units/tick
+export type BowTier = { name: string; drawMax: number; maxSpeed: number };
+export const BOW_TIERS: readonly BowTier[] = [
+  { name: 'Hunting bow', drawMax: 40, maxSpeed: 32 },
+  { name: 'Recurve bow', drawMax: 32, maxSpeed: 37 },
+  { name: 'Compound bow', drawMax: 24, maxSpeed: 42 },
+];
+export const TIER_BY_ROUND = [0, 1, 1, 2, 2];                       // clearing rounds 1 and 3 earns an upgrade
 export const ARROW_GRAVITY = 400;                                   // milli-units/tick²
 export const AIM_MAX_SLOPE = 5;                                     // |dx| ≤ 5×|dy|, about 79° from straight up
 export const ARROW_MARGIN = 40;                                     // units past the edge before an arrow is gone
@@ -37,6 +44,7 @@ export const LONG_RANGE = 600;                                      // units fro
 export const MULTI_HIT_BONUS = 200;                                 // per extra target on one arrow
 export const COMBO_STEP_QUARTERS = 1, COMBO_MAX_STEPS = 8;          // +25% per streak step, up to ×3
 export const PERFECT_ROUND_BONUS = 1000, ARROW_LEFT_BONUS = 25;
+export const STARS_FOR_BONUS = 3, STAR_BONUS = 3000;                // one shooting star crosses each round
 
 export const MAX_RUN_TICKS = 25000;
 export const DEFAULT_SEED = 'gobble-2026';

@@ -1,6 +1,7 @@
 import {
   MILLI as M, ROUNDS, TARGETS_PER_ROUND, ARROWS_PER_ROUND, MAX_ON_SCREEN, ROUND_QUOTA, INTRO_TICKS,
-  FIRST_SPAWN_TICKS, DRAW_MIN_TICKS, DRAW_MAX_TICKS, PERFECT_ROUND_BONUS, ARROW_LEFT_BONUS,
+  FIRST_SPAWN_TICKS, DRAW_MIN_TICKS, PERFECT_ROUND_BONUS, ARROW_LEFT_BONUS, BOW_TIERS, TIER_BY_ROUND,
+  STARS_FOR_BONUS, STAR_BONUS,
 } from './constants';
 import { SPECIES } from './species';
 import { fireArrow, stepArrow, arrowOut, segmentHitsCircle } from './arrows';
@@ -8,13 +9,18 @@ import { spawnTarget, stepTarget, fleeTarget, hitTarget, isHittable } from './ta
 import { hitPoints, isLongShot } from './scoring';
 import type { Arrow, GameEvent, GameState, Input, RoundSummary, RunPlan, Target } from './types';
 
+/** Which bow the player has in a round: upgrades come from clearing rounds, so everyone on a seed gets the same ones. */
+export function tierFor(round: number): number {
+  return TIER_BY_ROUND[round];
+}
+
 export function createInitialState(plan: RunPlan): GameState {
   return {
     tick: 0, phase: 'intro', phaseTicks: 0, round: 0, outcome: 'none',
     targets: [], arrows: [], nextId: 0, spawned: 0, spawnTimer: FIRST_SPAWN_TICKS, outOfArrows: false,
     arrowsLeft: ARROWS_PER_ROUND, drawTicks: 0, wasDrawing: false,
     score: 0, roundHits: 0, roundPoints: 0, streak: 0,
-    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0 },
+    stats: { shots: 0, hits: 0, longShots: 0, multiHits: 0, goldenHits: 0, bestStreak: 0, stars: 0 },
     summaries: [], events: [], plan,
   };
 }
@@ -46,16 +52,18 @@ export function step(s: GameState, input: Input): GameState {
 
   const round = s.round;
   const roundPlan = s.plan.rounds[round];
+  const tier = tierFor(round);
+  const total = roundPlan.targets.length;
   let { nextId, arrowsLeft, drawTicks, streak, score, roundHits, roundPoints, spawned, spawnTimer, outOfArrows } = s;
   const stats = { ...s.stats };
 
   // a. Bow: hold to draw, release to fire.
   let arrows: Arrow[] = s.arrows;
   if (input.drawing) {
-    drawTicks = Math.min(drawTicks + 1, DRAW_MAX_TICKS);
+    drawTicks = Math.min(drawTicks + 1, BOW_TIERS[tier].drawMax);
   } else if (s.wasDrawing) {
     if (drawTicks >= DRAW_MIN_TICKS && arrowsLeft > 0) {
-      const a = fireArrow(drawTicks, input.aimX, input.aimY, nextId++);
+      const a = fireArrow(drawTicks, input.aimX, input.aimY, nextId++, tier);
       arrows = [...arrows, a];
       arrowsLeft -= 1;
       stats.shots += 1;
@@ -75,15 +83,15 @@ export function step(s: GameState, input: Input): GameState {
   });
 
   // c. Spawn the next target once its gap has passed and a slot is free.
-  if (!outOfArrows && spawned < TARGETS_PER_ROUND) {
+  if (!outOfArrows && spawned < total) {
     spawnTimer -= 1;
-    const flying = targets.reduce((n, t) => n + (t.status === 'flying' ? 1 : 0), 0);
+    const flying = targets.reduce((n, t) => n + (t.status === 'flying' && t.species !== 'star' ? 1 : 0), 0);
     if (spawnTimer <= 0 && flying < MAX_ON_SCREEN) {
       const t = spawnTarget(roundPlan.targets[spawned], round, nextId++, spawned);
       targets.push(t);
       events.push({ type: 'spawn', targetId: t.id, species: t.species });
       spawned += 1;
-      spawnTimer = spawned < TARGETS_PER_ROUND ? roundPlan.targets[spawned].gap : 0;
+      spawnTimer = spawned < total ? roundPlan.targets[spawned].gap : 0;
     }
   }
 
@@ -105,11 +113,18 @@ export function step(s: GameState, input: Input): GameState {
       if (a.hits >= 1) stats.multiHits += 1;
       a = { ...a, hits: a.hits + 1 };
       targets[i] = hitTarget(t);
-      score += points; roundPoints += points; roundHits += 1;
-      stats.hits += 1;
+      score += points; roundPoints += points;
+      if (t.species !== 'star') { roundHits += 1; stats.hits += 1; }
       if (long) stats.longShots += 1;
       if (t.species === 'golden') stats.goldenHits += 1;
       events.push({ type: 'hit', targetId: t.id, arrowId: a.id, species: t.species, x: t.x, y: t.y, points, long, multi: a.hits, streak: a.streakAt });
+      if (t.species === 'star') {
+        stats.stars += 1;
+        if (stats.stars === STARS_FOR_BONUS) {
+          score += STAR_BONUS; roundPoints += STAR_BONUS;
+          events.push({ type: 'starBonus', points: STAR_BONUS });
+        }
+      }
     }
     if (arrowOut(a)) {
       if (a.hits === 0) { streak = 0; events.push({ type: 'miss', arrowId: a.id }); }
@@ -134,7 +149,7 @@ export function step(s: GameState, input: Input): GameState {
   };
 
   // f. Round over: nothing left to come and nothing left in the sky.
-  const pending = !outOfArrows && spawned < TARGETS_PER_ROUND;
+  const pending = !outOfArrows && spawned < total;
   if (pending || live.length > 0) return next;
 
   for (const a of arrows) {

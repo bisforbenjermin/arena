@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BOW_X, BOW_Y, DRAW_MAX_TICKS, DRAW_MIN_TICKS, MILLI } from '../../engine/constants';
+import { BOW_TIERS, BOW_X, BOW_Y, DRAW_MIN_TICKS, MILLI } from '../../engine/constants';
 import { previewPath } from '../../engine/preview';
 import { BOW_TIP } from '../art/props';
 import { DEPTH, N, S } from '../config';
@@ -17,6 +17,8 @@ export class BowView {
   private ring: Phaser.GameObjects.Graphics;
   private guide: Phaser.GameObjects.Graphics;
   private angle = 0;
+  private tier = 0;
+  private bowImg: Phaser.GameObjects.Image;
 
   constructor(private scene: Phaser.Scene, private showGuide: boolean) {
     const x = BOW_X * S, y = BOW_Y * S;
@@ -25,8 +27,15 @@ export class BowView {
     this.root = scene.add.container(x, y).setDepth(DEPTH.bow);
     this.string = scene.add.graphics();
     this.nocked = scene.add.image(REST_TIP, 0, 'arrow').setOrigin((104 - 2) / 104, 0.5);
-    this.root.add([this.string, scene.add.image(0, 0, 'bow'), this.nocked]);
+    this.bowImg = scene.add.image(0, 0, 'bow-0');
+    this.root.add([this.string, this.bowImg, this.nocked]);
     this.update({ aimX: BOW_X, aimY: 0, angle: 0 }, 0, true, false);
+  }
+
+  /** Swaps in the upgraded bow. */
+  setTier(t: number): void {
+    this.tier = t;
+    this.bowImg.setTexture(`bow-${t}`);
   }
 
   /** `draw` is the engine's draw ticks; `armed` is false when the quiver is empty. */
@@ -34,7 +43,8 @@ export class BowView {
     // ease toward the aim so the bow doesn't jitter under a thumb
     this.angle += (aim.angle - this.angle) * 0.6;
     this.root.setRotation(this.angle - Math.PI / 2);
-    const p = Math.min(draw, DRAW_MAX_TICKS) / DRAW_MAX_TICKS;
+    const drawMax = BOW_TIERS[this.tier].drawMax;
+    const p = Math.min(draw, drawMax) / drawMax;
     const pull = MAX_PULL * Math.sin(p * Math.PI / 2);
     const nockX = BOW_TIP.x - (armed ? pull : 0);
     this.string.clear();
@@ -49,7 +59,7 @@ export class BowView {
     this.ring.clear();
     if (drawing && armed && draw > 0) {
       const ready = draw >= DRAW_MIN_TICKS;
-      const full = draw >= DRAW_MAX_TICKS;
+      const full = draw >= drawMax;
       const col = full ? N.gold : ready ? N.cranberry : N.paper;
       const start = this.angle - Math.PI / 2 + Math.PI * 0.62;
       this.ring.lineStyle(14, N.ink, 0.45);
@@ -61,7 +71,7 @@ export class BowView {
     this.guide.clear();
     if (this.showGuide && drawing && armed) {
       // dotted arc on a dark halo so it reads against both the bright horizon and the night sky
-      const pts = previewPath(draw, aim.aimX, aim.aimY, 70, 2).slice(1);
+      const pts = previewPath(draw, aim.aimX, aim.aimY, 70, 2, this.tier).slice(1);
       pts.forEach((pt, i) => {
         const fade = 1 - i / pts.length;
         const x = pt.x / MILLI * S, y = pt.y / MILLI * S, r = 5 + 5 * fade;
@@ -71,6 +81,12 @@ export class BowView {
         this.guide.fillCircle(x, y, r);
       });
     }
+  }
+
+  /** Upgrade flourish: the bow pops and glints. */
+  celebrate(): void {
+    this.root.setScale(0.6);
+    this.scene.tweens.add({ targets: this.root, scale: 1, duration: 520, ease: 'Back.easeOut' });
   }
 
   kick(): void {

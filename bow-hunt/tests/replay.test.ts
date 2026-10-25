@@ -71,7 +71,7 @@ describe('scoring in a real run', () => {
       if (comboQuarters(e.streak) > 4) sawCombo = true;
     }
     expect(sawCombo).toBe(true);
-    const fromEvents = events.reduce((n, e) => n + (e.type === 'hit' ? e.points : e.type === 'roundEnd' ? e.summary.arrowBonus + e.summary.perfectBonus : 0), 0);
+    const fromEvents = events.reduce((n, e) => n + (e.type === 'hit' ? e.points : e.type === 'roundEnd' ? e.summary.arrowBonus + e.summary.perfectBonus : e.type === 'starBonus' ? e.points : 0), 0);
     expect(fromEvents).toBe(s.score);
   });
 });
@@ -97,4 +97,4 @@ describe('golden scores', () => {
   });
 });
 
-const PINNED: number[] = [13408, 9890, 10744];
+const PINNED: number[] = [10938, 11790, 11041];

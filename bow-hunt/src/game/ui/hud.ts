@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ARROWS_PER_ROUND, ROUNDS, ROUND_QUOTA, TARGETS_PER_ROUND } from '../../engine/constants';
+import { ARROWS_PER_ROUND, ROUNDS, ROUND_QUOTA, STARS_FOR_BONUS, TARGETS_PER_ROUND } from '../../engine/constants';
 import { comboQuarters } from '../../engine/scoring';
 import type { Mode } from '../../engine/types';
 import { C, DEPTH, N } from '../config';
@@ -21,6 +21,8 @@ export class Hud {
   private combo: Phaser.GameObjects.Container;
   private comboText: Phaser.GameObjects.Text;
   private banner?: Phaser.GameObjects.Container;
+  private stars: Phaser.GameObjects.Image[] = [];
+  private bowText: Phaser.GameObjects.Text;
 
   constructor(private scene: Phaser.Scene, mode: Mode) {
     const d = DEPTH.hud;
@@ -57,6 +59,13 @@ export class Hud {
       this.quiver.push(scene.add.image(56 + i * 15, 1830, 'quiver-arrow').setDepth(d).setRotation(-0.12 + i * 0.012));
     }
     this.quiverText = text(scene, 300, 1790, '15', { size: 58, color: C.paper, stroke: 8 }).setDepth(d);
+
+    this.bowText = text(scene, 50, 1716, '', { size: 34, font: 'hand', color: C.paper, stroke: 5 }).setDepth(d);
+
+    // three stars for the star bonus, under the sound and pause buttons
+    for (let i = 0; i < STARS_FOR_BONUS; i++) {
+      this.stars.push(scene.add.image(860 + i * 66, 350, 'star').setScale(0.5).setAlpha(0.3).setDepth(d));
+    }
 
     // combo, bottom right
     this.combo = scene.add.container(900, 1812).setDepth(d).setVisible(false);
@@ -103,6 +112,19 @@ export class Hud {
   /** Any birds that never flew this round (quiver ran dry) count as missed. */
   missRemaining(): void {
     for (const p of this.pips) if (p.state === 'pending') { p.state = 'missed'; p.img.setFrame(PIP_FRAMES.missed); }
+  }
+
+  setStars(n: number): void {
+    this.stars.forEach((img, i) => {
+      if (i < n && img.alpha < 1) {
+        img.setAlpha(1);
+        this.scene.tweens.add({ targets: img, scale: 0.85, angle: 144, duration: 260, yoyo: true, ease: 'Back.easeOut' });
+      }
+    });
+  }
+
+  setBow(name: string): void {
+    this.bowText.setText(name);
   }
 
   setArrows(left: number): void {

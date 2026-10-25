@@ -24,28 +24,78 @@ export function drawArrow(): HTMLCanvasElement {
 /** Recurve bow, string side on the left. Limb tips at (BOW_TIP.x, ±BOW_TIP.y) from the grip, which sits at the canvas center. */
 export const BOW_SIZE = { w: 120, h: 330 };
 export const BOW_TIP = { x: -18, y: 148 };
-export function drawBow(): HTMLCanvasElement {
+type BowLook = { limbDark: string; limbLight: string; grip: string; tipCam: boolean; trim?: string };
+const BOW_LOOKS: BowLook[] = [
+  { limbDark: '#9A5B2E', limbLight: '#D79B55', grip: C.cranberry, tipCam: false },               // hunting bow: plain ash
+  { limbDark: '#4E2A18', limbLight: '#9C5A2C', grip: '#2B1D24', tipCam: false, trim: C.gold },   // recurve: dark walnut, brass tips
+  { limbDark: '#5D6873', limbLight: '#D3DBE2', grip: '#1E2228', tipCam: true, trim: C.cranberry }, // compound: aluminum, cams
+];
+
+/** One bow per upgrade tier. Same tip geometry so the string code works for all three. */
+export function drawBow(tier = 0): HTMLCanvasElement {
+  const look = BOW_LOOKS[tier];
   const { c, ctx } = makeCanvas(BOW_SIZE.w, BOW_SIZE.h);
   ctx.translate(BOW_SIZE.w / 2, BOW_SIZE.h / 2);
+  const curl = tier === 1 ? 12 : 4;
   const limb = (s: 1 | -1) => {
     ctx.beginPath();
     ctx.moveTo(10, 0);
-    ctx.bezierCurveTo(44, s * 40, 34, s * 120, BOW_TIP.x + 6, s * (BOW_TIP.y - 4));
-    ctx.quadraticCurveTo(BOW_TIP.x - 4, s * (BOW_TIP.y + 8), BOW_TIP.x, s * BOW_TIP.y);
+    if (tier === 2) {
+      ctx.lineTo(30, s * 40); ctx.lineTo(BOW_TIP.x + 14, s * (BOW_TIP.y - 6)); ctx.lineTo(BOW_TIP.x, s * BOW_TIP.y);
+    } else {
+      ctx.bezierCurveTo(44, s * 40, 34, s * 120, BOW_TIP.x + 6, s * (BOW_TIP.y - 4));
+      ctx.quadraticCurveTo(BOW_TIP.x - curl, s * (BOW_TIP.y + 8), BOW_TIP.x, s * BOW_TIP.y);
+    }
   };
-  ctx.lineCap = 'round';
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   for (const s of [1, -1] as const) {
-    ctx.strokeStyle = C.ink; ctx.lineWidth = 17; limb(s); ctx.stroke();
+    ctx.strokeStyle = C.ink; ctx.lineWidth = tier === 2 ? 19 : 17; limb(s); ctx.stroke();
     const g = ctx.createLinearGradient(0, 0, 0, s * 150);
-    g.addColorStop(0, '#9A5B2E'); g.addColorStop(1, '#D79B55');
-    ctx.strokeStyle = g; ctx.lineWidth = 11; limb(s); ctx.stroke();
+    g.addColorStop(0, look.limbDark); g.addColorStop(1, look.limbLight);
+    ctx.strokeStyle = g; ctx.lineWidth = tier === 2 ? 13 : 11; limb(s); ctx.stroke();
+    if (look.trim) circle(ctx, BOW_TIP.x, s * BOW_TIP.y, tier === 2 ? 4 : 6, look.trim);
+    if (look.tipCam) {
+      circle(ctx, BOW_TIP.x, s * BOW_TIP.y, 15, C.ink);
+      circle(ctx, BOW_TIP.x, s * BOW_TIP.y, 11, '#9AA6B2');
+      circle(ctx, BOW_TIP.x + 3, s * BOW_TIP.y, 4, C.ink);
+    }
   }
   ctx.fillStyle = C.ink;
-  ctx.beginPath(); ctx.roundRect(0, -30, 26, 60, 8); ctx.fill();
-  ctx.fillStyle = C.cranberry;
-  ctx.beginPath(); ctx.roundRect(3, -27, 20, 54, 6); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(0, -32, 28, 64, 8); ctx.fill();
+  ctx.fillStyle = look.grip;
+  ctx.beginPath(); ctx.roundRect(3, -29, 22, 58, 6); ctx.fill();
   ctx.strokeStyle = 'rgba(247,236,216,0.5)'; ctx.lineWidth = 2;
-  for (let i = -22; i < 26; i += 8) { ctx.beginPath(); ctx.moveTo(4, i); ctx.lineTo(22, i + 5); ctx.stroke(); }
+  for (let i = -24; i < 26; i += 8) { ctx.beginPath(); ctx.moveTo(4, i); ctx.lineTo(24, i + 5); ctx.stroke(); }
+  if (tier >= 1) {   // sight pin
+    ctx.fillStyle = C.ink; ctx.fillRect(26, -46, 14, 6);
+    circle(ctx, 42, -43, 5, tier === 2 ? '#7CFF8A' : C.gold);
+  }
+  return c;
+}
+
+/** Shooting star: a gold five-point star with a paper edge. */
+export function drawStar(): HTMLCanvasElement {
+  const { c, ctx } = makeCanvas(120, 120);
+  ctx.translate(60, 60);
+  const path = (R: number, r: number) => {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const rad = i % 2 === 0 ? R : r;
+      const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+      ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+    }
+    ctx.closePath();
+  };
+  ctx.save();
+  ctx.shadowColor = 'rgba(43,29,36,0.45)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 5;
+  ctx.lineJoin = 'round';
+  path(46, 20); ctx.fillStyle = '#FFF8E1'; ctx.fill();
+  ctx.restore();
+  path(38, 16);
+  const g = ctx.createRadialGradient(-6, -8, 4, 0, 0, 40);
+  g.addColorStop(0, '#FFF6C9'); g.addColorStop(0.6, '#F2C14E'); g.addColorStop(1, '#D9921E');
+  ctx.fillStyle = g; ctx.fill();
+  circle(ctx, -8, -8, 5, 'rgba(255,255,255,0.8)');
   return c;
 }
 

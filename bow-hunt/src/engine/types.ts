@@ -30,6 +30,7 @@ export type GameEvent =
   | { type: 'escape'; targetId: number }
   | { type: 'outOfArrows' }
   | { type: 'landed'; targetId: number; x: number }
+  | { type: 'starBonus'; points: number }
   | { type: 'roundEnd'; summary: RoundSummary };
 
 export type RoundSummary = {
@@ -37,7 +38,7 @@ export type RoundSummary = {
   hitPoints: number; arrowBonus: number; perfectBonus: number; passed: boolean;
 };
 
-export type Stats = { shots: number; hits: number; longShots: number; multiHits: number; goldenHits: number; bestStreak: number };
+export type Stats = { shots: number; hits: number; longShots: number; multiHits: number; goldenHits: number; bestStreak: number; stars: number };
 
 export type GameState = {
   tick: number; phase: Phase; phaseTicks: number; round: number; outcome: Outcome;

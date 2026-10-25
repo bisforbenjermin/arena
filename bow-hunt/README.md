@@ -4,8 +4,11 @@ Portrait mobile archery game. Ducks, geese, turkeys and a rare golden turkey cro
 
 ## Play
 
-- **Aim and shoot:** press anywhere, drag back like a bowstring, let go. The arrow flies opposite the drag. Holding longer draws harder (about 2/3 s to full power, when the ring turns gold).
+- **Aim and shoot:** press anywhere, drag back like a bowstring, let go. The arrow flies opposite the drag. Holding longer draws harder; the ring turns gold at full power.
+- **Keyboard:** ← → (or A/D) swing the bow, ↑ re-centers it, hold space to draw, let go to shoot. Esc or P pauses. On the title, Enter starts the daily hunt and space starts practice.
 - **Rounds:** 5 rounds of 10 birds with 15 arrows each. Hit the round's quota (5, 6, 6, 7, 8) to move on. Miss it and the hunt is over. Birds get faster and change height more often each round.
+- **Bow upgrades:** clearing round 1 gives a recurve bow, clearing round 3 a compound bow. Each draws faster and shoots harder (flatter arcs).
+- **Shooting stars:** one crosses each round, high and fast. Each pays 250, and hitting 3 in one hunt adds 3,000. Stars don't count toward the quota.
 - **Points:** goose 75, turkey 100, duck 150, golden turkey 1,000 (about one round in six has one).
   - Hits more than 600 units from the bow pay +50%.
   - An arrow passes through what it hits, so each extra bird on one arrow adds +200.
@@ -20,7 +23,7 @@ Portrait mobile archery game. Ducks, geese, turkeys and a rare golden turkey cro
 
 ```
 npm install
-npm test            # 46 tests: engine rules, scoring, replay, skill gradient, aim mapping, run loop
+npm test            # 47 tests: engine rules, scoring, replay, skill gradient, aim mapping, run loop
 npm run dev         # http://localhost:5173
 npm run dev:phone   # same, reachable from a phone on your Wi-Fi (open the Network URL it prints)
 npm run build       # static site in dist/

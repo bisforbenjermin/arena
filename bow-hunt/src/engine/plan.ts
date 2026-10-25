@@ -46,6 +46,9 @@ export function generateRunPlan(seed: string): RunPlan {
       const species = i === goldenSlot ? 'golden' : pickSpecies(rng, r);
       targets.push(planTarget(rng, r, species));
     }
+    // one shooting star per round, somewhere in the middle of the flock; it doesn't count toward the quota
+    const starSlot = rng.int(2, TARGETS_PER_ROUND - 2);
+    targets.splice(starSlot, 0, planTarget(rng, r, 'star'));
     rounds.push({ golden, targets });
   }
   return { seed, rounds };
