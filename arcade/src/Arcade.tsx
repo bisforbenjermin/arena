@@ -3,13 +3,11 @@ import type { GameEvent, GameModule } from '../../contracts/game-module';
 import TailspinModule from '../../games/tailspin/index';
 import StackShiftModule from '../../games/stack-shift/index';
 import GlyphTraceModule from '../../games/glyph-trace/index';
-import { Game as BowHuntGame } from '../../bow-hunt/src/ui/Game';
-import { compressInputs, runReplay } from '../../bow-hunt/src/engine/replay';
-import type { GameState, Input } from '../../bow-hunt/src/engine/types';
 import { replayScore, runModule } from './runtime';
 import { pacificDay, seedNumber } from './seed';
 
-type CabinetId = 'bow-hunt' | 'tailspin' | 'stack-shift' | 'glyph-trace';
+// Bow Hunt left this page on 2026-10-25: it is now its own Phaser build in bow-hunt/ with its own link.
+type CabinetId = 'tailspin' | 'stack-shift' | 'glyph-trace';
 
 type Cabinet = {
   id: CabinetId;
@@ -25,16 +23,6 @@ type Cabinet = {
 };
 
 const CABINETS: Cabinet[] = [
-  {
-    id: 'bow-hunt',
-    title: 'Bow Hunt: Thanksgiving',
-    pitch: 'Five rounds of turkeys. Hit each round’s quota or the hunt is over.',
-    how: 'Press anywhere, drag back like a bowstring, release. Hold longer for more power. Lead your target.',
-    facts: 'Standalone launch build · runs until you clear or miss a quota',
-    kind: 'standalone',
-    accent: 'var(--harvest)',
-    ratio: 16 / 9,
-  },
   {
     id: 'tailspin',
     title: 'Tailspin',
@@ -93,21 +81,6 @@ function F1Stage({ mod, seed, ratio, onResult }: { mod: GameModule; seed: number
     });
   }, [mod, seed]);
   return <div className="stage f1" ref={ref} style={{ ['--ratio' as string]: String(ratio) }} />;
-}
-
-function BowStage({ seed, onResult }: { seed: string; onResult: (r: Result) => void }) {
-  const onFinish = (log: Input[], s: GameState) => {
-    onResult({ score: s.score, verified: null });
-    setTimeout(() => {
-      const r = runReplay({ version: 1, seed, inputs: compressInputs(log) });
-      onResult({ score: s.score, verified: r.score });
-    }, 30);
-  };
-  return (
-    <div className="stage bow">
-      <BowHuntGame seed={seed} onFinish={onFinish} />
-    </div>
-  );
 }
 
 export function Arcade() {
@@ -186,10 +159,8 @@ export function Arcade() {
             <h2>{cab.title}</h2>
             <span className="mono seedtag">{seedLabel}</span>
           </div>
-          {cab.kind === 'f1' && cab.module ? (
+          {cab.kind === 'f1' && cab.module && (
             <F1Stage key={`${cab.id}-${runKey}-${seed}`} mod={cab.module} seed={seed} ratio={cab.ratio} onResult={setResult} />
-          ) : (
-            <BowStage key={`${cab.id}-${runKey}-${seedText}`} seed={`bh-${seedText}`} onResult={setResult} />
           )}
           {!result && <p className="how">{cab.how}</p>}
           {result && (

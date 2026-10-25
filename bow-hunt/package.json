@@ -10,7 +10,8 @@
     "test": "vitest run",
     "verify": "tsx scripts/verify-replay.ts",
     "fixture": "tsx scripts/make-fixture.ts",
-    "dev:phone": "vite --host"
+    "dev:phone": "vite --host",
+    "build:single": "vite build -c vite.single.config.ts && node scripts/to-artifact.mjs"
   },
   "dependencies": {
     "@fontsource/alfa-slab-one": "^5.3.0",
@@ -22,6 +23,7 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
+    "vite-plugin-singlefile": "^2.3.4",
     "vitest": "^5.0.5"
   }
 }

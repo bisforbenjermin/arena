@@ -3,3 +3,4 @@ dist
 .pglite
 .vercel
 .env*
+dist-single
