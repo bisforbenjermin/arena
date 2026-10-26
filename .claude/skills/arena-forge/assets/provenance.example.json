@@ -1,0 +1,16 @@
+{
+  "gameId": "ember-herd",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "agent",
+  "parentLineage": null,
+  "authoredAt": "2026-10-25",
+  "license": "proprietary",
+  "ipClearance": "Checked 2026-10-25: searched \"Ember Herd game\" and \"Ember Herd app\"; no game or app with that name found. An RPG titled \"Ember\" (Steam, consoles, iOS) shares one word in a different genre; flagged for the founder. Closest genre: herding games; no animals, characters, names or level layouts borrowed. All art and sound are procedural.",
+  "notes": "ILLUSTRATIVE EXAMPLE of the file shape only. The values are not from a real build.",
+  "pitchId": "P-20261025-example-A",
+  "forgedBy": "deep on fable",
+  "mechanicDNA": "drag / embers follow the lure only inside its pull radius, and the static edge eats any ember it touches / embers flock, so gathering a crowd before delivering beats ferrying them one by one",
+  "dependencies": [],
+  "assets": []
+}
