@@ -3,8 +3,8 @@
 Claude Code reads this first in every session. ARENA's canon lives in this repo, so governance sits with the code it governs.
 
 ## Where you are
-- This repo is `~/code/arena`. If `pwd` shows anything else, stop: you're in the wrong repo.
-- Never build in `~/arena` (the July repo) or `~/HQ` (superseded on 2026-10-19). Both are history.
+- This repo is `~/arena-remote`. If `pwd` shows anything else, stop: you're in the wrong repo.
+- Never build in `~/arena` (the July repo, now a `.git`-only skeleton) or `~/HQ` (superseded on 2026-10-19). Both are history.
 
 ## The ledger
 "The ledger" means this set of files, not a single STATE_LEDGER file:

@@ -2,6 +2,7 @@
 One entry per work session. Add at CLOSE. Format: `YYMMDD | [venture] | what moved | outcome`
 
 ---
+261025 | ARENA | ledger review; CLAUDE.md canonical path corrected (`~/code/arena` → `~/arena-remote`); July-repo note updated to reflect it's a `.git`-only skeleton; no code, no rulings | NEXT unchanged: rule FORMAT-1 v2 or resolve bow-hunt stakes HANDOFF
 261024 | ARENA | orientation; capsule drift confirmed (stamp 261023-1 behind day-of work on 261023); regen to 261024-1 folds in FORMAT-1 v2 + bow-hunt HANDOFF as real G3 gates; ops/ sibling dir marked SUPERSEDED (outside repo) | NEXT: rule FORMAT-1 v2 or resolve bow-hunt stakes HANDOFF
 261023 | ARENA | capsule regen 261023-1 (79249f8); HANDOFF bow-hunt stakes written (3a7a135); GAME-01 bow hunt spec saved (4bd0fb9); FORMAT-1 proposed → cold-critic killed v1 (6 KILLs) → rewrote thin v2 (0e4bbf4) | FORMAT-1 v2 awaits founder ruling; bow-hunt build blocked on stakes handoff
 261023 | ARENA | orientation only; capsule drift confirmed (stamp 261020-5, two commits behind); API key stashed at ~/.anthropic/key; no code touched | G3 is next; capsule needs regen before build
