@@ -1,15 +1,13 @@
 # CONTEXT CAPSULE
-Updated: 261024-1 (prev: 261023-1)
+Updated: 261025-1 (prev: 261024-1)
 Keep this under one page. Rewrite at every significant direction change.
 
 ---
 
 ## NEXT ACTION
-Two things gate G3 — pick one:
-- **Rule FORMAT-1 v2** (`governance/00-COMMAND/PROPOSED/FORMAT-1-v2.md`, commit 0e4bbf4) — thin v2 after cold-critic killed v1 with 6 KILLs. `/rule FORMAT-1 <words>`.
-- **Resolve bow-hunt stakes HANDOFF** (3a7a135) — unblocks GAME-01 build.
+**Resolve bow-hunt stakes HANDOFF** (3a7a135) — unblocks GAME-01 build.
 
-G3 remains next in factory sequence but is downstream of both. L1 (lore) still yours — blocks L2–L5.
+FORMAT-1 ratified 261025 (A. Ratify as-is). G3 build in flight this session via `/build-next G3` after forge-v4 install. L1 (lore) still yours — blocks L2–L5.
 
 ---
 
@@ -28,9 +26,11 @@ G3 remains next in factory sequence but is downstream of both. L1 (lore) still y
 - G2 ✅ Sandbox runner + 5 gates; jsdom (Playwright incompatible on mac12) — commit 3dcac88
 - G3 ⏭ next, gated
 
-**In flight (261023):**
-- FORMAT-1 — high-score rounds standardized. v1 proposed 4f7de06, cold-critic killed w/ 6 KILLs + 3 FIXes (77024fd), thin v2 rewrite 0e4bbf4. **Awaits founder ruling.**
+**In flight (261025):**
+- FORMAT-1 ✅ ratified 261025 (A. Ratify as-is); drafts archived to `governance/90-ARCHIVE/2026-10-25/`.
 - GAME-01 bow hunt — spec saved 4bd0fb9; HANDOFF for stakes written 3a7a135. **Build blocked.**
+- G2 getScore numeric/non-NaN check — in flight (FORMAT-1 downstream).
+- G3 bot-playtest — in flight.
 
 **Repo structure:**
 - Operable (CI): `contracts/` · `db/` · `games/` · `tests/` · `app/`
@@ -44,15 +44,16 @@ G3 remains next in factory sequence but is downstream of both. L1 (lore) still y
 - `npm test` runs every test; CI runs on push + PR
 - `.claude/hooks/guard-paths.mjs` blocks writes to `contracts/`, `governance/`, July specs outside the right session
 
-**Frozen rulings (governance/10-CANON/DECISIONS/) — 20 files:**
+**Frozen rulings (governance/10-CANON/DECISIONS/) — 21 files:**
 - PR-1..6 — RULED 2026-09-06
 - GTM-1 · GTM-2 · CP-0 · CREDIT-1 — RULED 2026-07-30; CREDIT-1 ratified 2026-10-20
 - OPS-1 · OPS-2 · OPS-3 — RULED 2026-07-19 / 2026-08-10
 - AUD-1 · BRAND-1..3 · CANON-2 · GTM-4 · STACK-1 — RULED 2026-10-20
+- FORMAT-1 — RULED 2026-10-25
 
 **Open items:**
-- FORMAT-1 v2 awaiting ruling (see above)
 - Bow-hunt stakes HANDOFF awaiting ruling (see above)
+- PR-7 (replayable input), PR-8 (score direction + range) — PROPOSED, decision cards pending
 - World name (Freehold / Arclight / Quarterlight / Elsewhere) — blocks BRAND-1, trademark search
 - GTM-3 The First Cache — PROPOSED; needs max-weight session to supersede GTM-1
 - OPS-4 Operating board + cold critique — PROPOSED, parked in `governance/00-COMMAND/PROPOSED/`
