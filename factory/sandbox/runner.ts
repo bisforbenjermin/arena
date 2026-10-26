@@ -17,6 +17,7 @@ import {
   bundleCandidate,
   checkBundleSize,
   checkDeterminism,
+  checkScoreNumeric,
   checkLifecycle,
   checkMemoryLeak,
   type CheckResult,
@@ -81,6 +82,11 @@ async function processJob(jobId: string): Promise<void> {
   const detCheck = await checkDeterminism(bundleJs);
   results.push(detCheck);
   console.log(`  determinism: ${detCheck.pass ? 'PASS' : `FAIL — ${detCheck.reason}`}`);
+
+  // Gate 3b — score numeric (FORMAT-1 point 1/2: terminal numeric, non-NaN)
+  const scoreCheck = await checkScoreNumeric(bundleJs);
+  results.push(scoreCheck);
+  console.log(`  score-numeric: ${scoreCheck.pass ? 'PASS' : `FAIL — ${scoreCheck.reason}`}`);
 
   // Gate 4 — lifecycle (jsdom view mount + destroy)
   const lcCheck = await checkLifecycle(bundleJs);

@@ -122,6 +122,33 @@ export async function checkDeterminism(bundlePath: string): Promise<CheckResult>
   return { pass: true, gate: 'determinism' };
 }
 
+// ─── GATE 3b — SCORE TYPE (FORMAT-1 point 1/2: terminal numeric, non-NaN) ────
+
+export async function checkScoreNumeric(bundlePath: string): Promise<CheckResult> {
+  let mod: GameModule;
+  try {
+    mod = await loadModule(bundlePath);
+  } catch (e) {
+    return { pass: false, gate: 'score-numeric', reason: `import failed: ${String(e)}` };
+  }
+
+  const sim: GameSim = mod.createSim();
+  const prngFactory  = makePrngFactory(0xf07a71);
+  sim.init({ seed: 0xf07a71, speedMultiplier: 1 }, prngFactory);
+  const totalTicks = mod.meta.durationSeconds * 60;
+  for (let tick = 1; tick <= totalTicks; tick++) sim.tick(1 / 60);
+  const score = sim.getScore();
+  sim.destroy();
+
+  if (typeof score !== 'number') {
+    return { pass: false, gate: 'score-numeric', reason: `getScore() returned ${typeof score}, not number (FORMAT-1 point 1)` };
+  }
+  if (Number.isNaN(score)) {
+    return { pass: false, gate: 'score-numeric', reason: `getScore() returned NaN (FORMAT-1 point 1)` };
+  }
+  return { pass: true, gate: 'score-numeric' };
+}
+
 // ─── GATE 4 — LIFECYCLE (jsdom, view mount + destroy) ────────────────────────
 
 export async function checkLifecycle(bundlePath: string): Promise<CheckResult> {
