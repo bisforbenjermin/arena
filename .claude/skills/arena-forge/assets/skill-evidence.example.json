@@ -3,7 +3,7 @@
   "gameVersion": "1.0.0",
   "generatedAt": "2026-10-25",
   "kind": "measured",
-  "note": "ILLUSTRATIVE EXAMPLE of the file shape only. The numbers are not from a real run. Set kind to \"forecast\" for any numbers no runner produced.",
+  "note": "ILLUSTRATIVE EXAMPLE of the file shape only. The numbers are not from a real run. Set kind to \"forecast\" for any numbers no runner produced. Extended on 2026-10-25 with completionRate, frameStability, skillGradient, verdict for G3 (see governance/00-COMMAND/FRICTION_LOG.md).",
   "rerun": "Run the repo's test command (see package.json); it runs tests/ember-herd.test.ts, which reads the seeds below.",
   "seeds": { "from": 1, "to": 200, "count": 200 },
   "reactionLimitTicks": 12,
@@ -27,5 +27,9 @@
     "randomAtMostHalfOfExpert": true,
     "greedyBetween": true,
     "expertVariationAtMost15Percent": true
-  }
+  },
+  "completionRate": { "random": 1.0, "greedy": 1.0, "expert": 1.0 },
+  "frameStability": { "maxTickMs": 4.1, "overBudgetTickCount": 0, "budgetMs": 16.667 },
+  "skillGradient": 871.1,
+  "verdict": "KEEP"
 }
