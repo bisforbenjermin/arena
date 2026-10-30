@@ -1,0 +1,16 @@
+{
+  "gameId": "grainline",
+  "gameVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "generatedBy": "agent",
+  "parentLineage": null,
+  "authoredAt": "2026-10-29",
+  "license": "proprietary",
+  "ipClearance": "Checked 2026-10-29: the draft title \"Sunder\" collided with an itch.io game and a student game of that name, and sits next to commercial titles \"Sundered\" and \"Sunderfolk\"; renamed. Searched \"Grainline\" game app: no game or app with that name found (nearest: Gravline on itch.io, GravityLine on iOS). Closest genre: arrow and direction-swipe reaction games; this adds a two-way grain read, a speed bonus and a combo cap. No characters, names, layouts or sounds borrowed. Art is procedural canvas; sound is procedural WebAudio. Collision check only, not trademark clearance.",
+  "notes": "First swipe-scheme game in the pool. Concept and first draft by DeepSeek v3 in chat mode (titled Sunder; it self-reported as Fable). Hardened and built in the repo by the strong profile on opus-5.5: input hygiene, seed-plus-input replay, speedMultiplier, a speed bonus on clean cuts after 50 expert bots tied for first under the draft scoring, BRAND-2 view, procedural sound, haptics.",
+  "pitchId": "P-20261029-deepseek-A",
+  "forgedBy": "strong on opus-5.5",
+  "mechanicDNA": "swipe / every swipe resolves the glyph, so a wrong read costs it and the combo / a speed bonus on clean cuts rewards a fast, sure read",
+  "dependencies": [],
+  "assets": []
+}
