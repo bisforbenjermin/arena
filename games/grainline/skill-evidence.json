@@ -1,0 +1,94 @@
+{
+  "gameId": "grainline",
+  "gameVersion": "1.0.0",
+  "generatedAt": "2026-10-29",
+  "kind": "measured",
+  "note": "Measured by tests/grainline.test.ts on Node. Speed 1 is the casual setting, speed 2 a broadcast final.",
+  "rerun": "npm test (runs tests/grainline.test.ts, which recomputes every number below and fails on any difference).",
+  "seeds": {
+    "from": 1,
+    "to": 200,
+    "count": 200,
+    "roundPrng": "mulberry32(seed), the house test PRNG from tests/determinism.ts",
+    "botPrng": "mulberry32(seed * 7919 + 1), separate from the round"
+  },
+  "reactionLimitTicks": 12,
+  "bots": {
+    "random": {
+      "description": "Ignores the glyph: uniform angle, swipes 6–60 ticks after it appears.",
+      "tuning": {
+        "reactMin": 6,
+        "reactMax": 60,
+        "noiseDeg": 0,
+        "misread": 0
+      },
+      "mean": 149.26,
+      "sd": 61.72,
+      "min": 10,
+      "max": 384
+    },
+    "greedy": {
+      "description": "Reads the grain sloppily: ±32°, 15% misreads, 22–55 ticks.",
+      "tuning": {
+        "reactMin": 22,
+        "reactMax": 55,
+        "noiseDeg": 32,
+        "misread": 0.15
+      },
+      "mean": 526.48,
+      "sd": 159.91,
+      "min": 218,
+      "max": 978
+    },
+    "expert": {
+      "description": "Reads the grain from the screen, ±8°, reacts 12–18 ticks (never under 200 ms).",
+      "tuning": {
+        "reactMin": 12,
+        "reactMax": 18,
+        "noiseDeg": 8,
+        "misread": 0
+      },
+      "mean": 1072.32,
+      "sd": 58.68,
+      "min": 899,
+      "max": 1229
+    }
+  },
+  "speed2": {
+    "random": {
+      "mean": 169.83,
+      "sd": 64.28,
+      "min": 20,
+      "max": 385
+    },
+    "greedy": {
+      "mean": 303.45,
+      "sd": 78.21,
+      "min": 128,
+      "max": 544
+    },
+    "expert": {
+      "mean": 2477.72,
+      "sd": 63.17,
+      "min": 2338,
+      "max": 2661
+    }
+  },
+  "seedConsistency": {
+    "expertCoefficientOfVariation": 0.0547,
+    "expertCoefficientOfVariationSpeed2": 0.0255
+  },
+  "topEnd": {
+    "seed": 777,
+    "expertPlayers": 50,
+    "distinctScores": 15,
+    "tiedForFirst": 1,
+    "why": "Prize rounds share a seed; experts must separate rather than tie at a ceiling."
+  },
+  "bars": {
+    "source": "Provisional bars from canon BUILD step 5, until G3 sets real ones.",
+    "randomAtMostHalfOfExpert": true,
+    "greedyBetween": true,
+    "expertVariationAtMost15Percent": true
+  }
+}
